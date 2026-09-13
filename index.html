@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1B2A4A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>SIGAJ — Agenda Judicial Inteligente</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231B2A4A'/><text x='50' y='68' text-anchor='middle' font-size='36'>⚖️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ========================================
+       SIGAJ — Sistema Inteligente de Gestión
+       de Agenda Judicial
+       Juzgado 14 Penal Municipal — Ibagué
+       ======================================== */
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primario: #1B2A4A;
+      --primario-claro: #2a3f6b;
+      --acento: #2E86AB;
+      --acento-hover: #247a9d;
+      --exito: #28A745;
+      --exito-suave: #e8f5eb;
+      --advertencia: #F0AD4E;
+      --advertencia-suave: #fef5e7;
+      --peligro: #DC3545;
+      --peligro-suave: #fce8ea;
+      --naranja: #E8762B;
+      --naranja-suave: #fdf0e6;
+      --superficie: #F3F5F8;
+      --tarjeta: #FFFFFF;
+      --texto: #1a1a2e;
+      --texto-secundario: #5a6275;
+      --borde: #e2e5ec;
+      --sombra: 0 2px 8px rgba(27,42,74,0.07);
+      --sombra-elevada: 0 8px 24px rgba(27,42,74,0.12);
+      --radio: 12px;
+      --radio-sm: 8px;
+      --transicion: 280ms ease;
+      --sidebar-ancho: 260px;
+      --header-alto: 64px;
+    }
+
+    /* Tema oscuro */
+    [data-tema="oscuro"] {
+      --primario: #0f1a2e;
+      --primario-claro: #1a2d50;
+      --superficie: #0d1117;
+      --tarjeta: #161b22;
+      --texto: #e6edf3;
+      --texto-secundario: #8b949e;
+      --borde: #30363d;
+      --sombra: 0 2px 8px rgba(0,0,0,0.3);
+      --sombra-elevada: 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--superficie);
+      color: var(--texto);
+      line-height: 1.55;
+      min-height: 100vh;
+      display: flex;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── ANIMACIONES ── */
+    @keyframes pulso-peligro {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(220,53,69,0.35); }
+      50% { box-shadow: 0 0 0 10px rgba(220,53,69,0); }
+    }
+
+    @keyframes pulso-badge {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    @keyframes entrada-arriba {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes shimmer {
+      from { opacity: 0.5; }
+      to { opacity: 1; }
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-ancho);
+      background: var(--primario);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100;
+      transition: transform var(--transicion);
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .sidebar-escudo {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .sidebar-escudo span {
+      font-size: 2.2rem;
+    }
+
+    .sidebar-despacho {
+      text-align: center;
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .sidebar-brand {
+      text-align: center;
+      padding: 16px 20px;
+    }
+
+    .sidebar-brand h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .sidebar-brand small {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.5);
+      display: block;
+      margin-top: 2px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 12px 10px;
+    }
+
+    .sidebar-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radio-sm);
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transicion);
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .sidebar-nav-item:hover {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+    }
+
+    .sidebar-nav-item.activo {
+      background: var(--acento);
+      color: #fff;
+    }
+
+    .sidebar-nav-item .icono {
+      font-size: 1.15rem;
+      width: 24px;
+      text-align: center;
+    }
+
+    .sidebar-nav-item .badge-nav {
+      margin-left: auto;
+      background: var(--peligro);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 6px;
+      animation: pulso-badge 1.8s ease infinite;
+    }
+
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.35);
+      text-align: center;
+    }
+
+    /* ── MAIN CONTENT ── */
+    .main {
+      flex: 1;
+      margin-left: var(--sidebar-ancho);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      height: var(--header-alto);
+      background: var(--tarjeta);
+      border-bottom: 1px solid var(--borde);
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .btn-menu-movil {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      padding: 6px;
+      color: var(--texto);
+    }
+
+    .header-titulo {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--texto);
+    }
+
+    .header-acciones {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-header {
+      background: none;
+      border: 1px solid var(--borde);
+      border-radius: var(--radio-sm);
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--texto-secundario);
+      transition: all var(--transicion);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-header:hover {
+      background: var(--superficie);
+      border-color: var(--acento);
+      color: var(--acento);
+    }
+
+    .btn-header .notif-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--peligro);
+      animation: pulso-badge 1.8s ease infinite;
+    }
+
+    /* ── CONTENIDO ── */
+    .contenido {
+      flex: 1;
+      padding: 28px;
+    }
+
+    .pantalla {
+      display: none;
+      animation: entrada-arriba 350ms ease;
+    }
+
+    .pantalla.visible {
+      display: block;
+    }
+
+    /* ── TARJETAS MÉTRICAS ── */
+    .metricas-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .metrica-card {
+      background: var(--tarjeta);
+      border-radius: var(--radio);
+      padding: 22px;
+      border: 1px solid var(--borde);
+      box-shadow: var(--sombra);
+      transition: all var(--transicion);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metrica-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .metrica-card:hover {
+      box-shadow: var(--sombra-elevada);
+      transform: translateY(-2px);
+    }
+
+    .metrica-card.total::before { background: var(--acento); }
+    .metrica-card.ok::before { background: var(--exito); }
+    .metrica-card.proximo::before { background: var(--advertencia); }
+    .metrica-card.vencido::before { background: var(--peligro); }
+
+    .metrica-card.vencido {
+      animation: pulso-peligro 2s ease infinite;
+    }
+
+    .metrica-icono {
+      font-size: 1.6rem;
+      margin-bottom: 8px;
+    }
+
+    .metrica-valor {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .metrica-card.total .metrica-valor { color: var(--acento); }
+    .metrica-card.ok .metrica-valor { color: var(--exito); }
+    .metrica-card.proximo .metrica-valor { color: var(--advertencia); }
+    .metrica-card.vencido .metrica-valor { color: var(--peligro); }
+
+    .metrica-label {
+      font-size: 0.8rem;
+      color: var(--texto-secundario);
+      font-weight: 500;
+    }
+
+    /* ── SECCIONES DEL DASHBOARD ── */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .panel {
+      background: var(--tarjeta);
+      border-radius: var(--radio);
+      border: 1px solid var(--borde);
+      box-shadow: var(--sombra);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--borde);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-header h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-body {
+      padding: 6px 0;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    /* ── LISTA DE URGENCIAS ── */
+    .urgencia-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--borde);
+      transition: background var(--transicion);
+      cursor: pointer;
+    }
+
+    .urgencia-item:last-child { border-bottom: none; }
+    .urgencia-item:hover { background: var(--superficie); }
+
+    .urgencia-estado {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .urgencia-estado.verde { background: var(--exito); }
+    .urgencia-estado.amarillo { background: var(--advertencia); }
+    .urgencia-estado.naranja { background: var(--naranja); }
+    .urgencia-estado.rojo {
+      background: var(--peligro);
+      animation: pulso-peligro 2s ease infinite;
+    }
+
+    .urgencia-info { flex: 1; min-width: 0; }
+
+    .urgencia-radicado {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--texto);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .urgencia-tipo {
+      font-size: 0.78rem;
+      color: var(--texto-secundario);
+    }
+
+    .urgencia-vence {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .urgencia-vence.verde { background: var(--exito-suave); color: #1a7a31; }
+    .urgencia-vence.amarillo { background: var(--advertencia-suave); color: #9a6b12; }
+    .urgencia-vence.naranja { background: var(--naranja-suave); color: #b85a14; }
+    .urgencia-vence.rojo { background: var(--peligro-suave); color: #b52030; font-weight: 700; }
+
+    /* ── CALENDARIO MINI ── */
+    .calendario {
+      padding: 16px 22px;
+    }
+
+    .cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .cal-header h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .cal-nav-btn {
+      background: none;
+      border: 1px solid var(--borde);
+      border-radius: 6px;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--texto-secundario);
+      transition: all var(--transicion);
+    }
+
+    .cal-nav-btn:hover {
+      background: var(--superficie);
+      color: var(--acento);
+    }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      text-align: center;
+    }
+
+    .cal-dia-nombre {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--texto-secundario);
+      padding: 6px 0;
+      text-transform: uppercase;
+    }
+
+    .cal-dia {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background var(--transicion);
+      position: relative;
+      color: var(--texto);
+    }
+
+    .cal-dia:hover { background: var(--superficie); }
+    .cal-dia.hoy {
+      background: var(--acento);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .cal-dia.otro-mes { color: var(--texto-secundario); opacity: 0.4; }
+
+    .cal-dia .cal-dots {
+      display: flex;
+      gap: 2px;
+      position: absolute;
+      bottom: 3px;
+    }
+
+    .cal-dia .cal-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+    }
+
+    /* ── FORMULARIO DE EVENTOS ── */
+    .form-card {
+      background: var(--tarjeta);
+      border-radius: var(--radio);
+      border: 1px solid var(--borde);
+      box-shadow: var(--sombra);
+      padding: 28px;
+      max-width: 780px;
+    }
+
+    .form-card h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .form-grupo {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-grupo.full { grid-column: 1 / -1; }
+
+    .form-grupo label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--texto-secundario);
+    }
+
+    .form-control {
+      border: 1px solid var(--borde);
+      border-radius: var(--radio-sm);
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: var(--texto);
+      background: var(--tarjeta);
+      transition: border-color var(--transicion), box-shadow var(--transicion);
+      width: 100%;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--acento);
+      box-shadow: 0 0 0 3px rgba(46,134,171,0.12);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-vencimiento {
+      background: var(--superficie);
+      border-radius: var(--radio-sm);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      grid-column: 1 / -1;
+    }
+
+    .form-vencimiento .venc-fecha {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--acento);
+    }
+
+    .form-vencimiento .venc-label {
+      font-size: 0.8rem;
+      color: var(--texto-secundario);
+    }
+
+    .form-acciones {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+
+    /* ── BOTONES ── */
+    .btn {
+      padding: 10px 22px;
+      border-radius: var(--radio-sm);
+      font-size: 0.88rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      transition: all var(--transicion);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .btn-primario {
+      background: var(--acento);
+      color: #fff;
+    }
+
+    .btn-primario:hover {
+      background: var(--acento-hover);
+      box-shadow: 0 4px 12px rgba(46,134,171,0.25);
+    }
+
+    .btn-secundario {
+      background: transparent;
+      color: var(--texto-secundario);
+      border: 1px solid var(--borde);
+    }
+
+    .btn-secundario:hover {
+      background: var(--superficie);
+      color: var(--texto);
+    }
+
+    .btn-peligro {
+      background: var(--peligro);
+      color: #fff;
+    }
+
+    .btn-peligro:hover {
+      background: #c82333;
+    }
+
+    .btn-exito {
+      background: var(--exito);
+      color: #fff;
+    }
+
+    .btn-exito:hover {
+      background: #218838;
+    }
+
+    /* ── TABLA DE EVENTOS ── */
+    .tabla-wrapper {
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+
+    .tabla-eventos {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .tabla-eventos th {
+      background: var(--superficie);
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--texto-secundario);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      border-bottom: 2px solid var(--borde);
+      position: sticky;
+      top: 0;
+    }
+
+    .tabla-eventos td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--borde);
+      vertical-align: middle;
+    }
+
+    .tabla-eventos tr:hover td {
+      background: var(--superficie);
+    }
+
+    .tabla-eventos tr.fila-vencida td {
+      background: var(--peligro-suave);
+    }
+
+    .tabla-eventos tr.fila-vencida {
+      animation: pulso-peligro 2.5s ease infinite;
+    }
+
+    .estado-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.76rem;
+      font-weight: 600;
+    }
+
+    .estado-badge.pendiente { background: var(--advertencia-suave); color: #9a6b12; }
+    .estado-badge.en_tramite { background: #e3f0ff; color: #1a5fa8; }
+    .estado-badge.cumplido { background: var(--exito-suave); color: #1a7a31; }
+    .estado-badge.vencido { background: var(--peligro-suave); color: #b52030; }
+
+    /* ── NOTIFICACIONES ── */
+    .notif-lista { list-style: none; }
+
+    .notif-item {
+      display: flex;
+      gap: 14px;
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--borde);
+      transition: background var(--transicion);
+    }
+
+    .notif-item:hover { background: var(--superficie); }
+
+    .notif-item.no-leida {
+      background: rgba(46,134,171,0.04);
+      border-left: 3px solid var(--acento);
+    }
+
+    .notif-icono {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .notif-contenido { flex: 1; }
+
+    .notif-titulo {
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .notif-detalle {
+      font-size: 0.8rem;
+      color: var(--texto-secundario);
+    }
+
+    .notif-tiempo {
+      font-size: 0.72rem;
+      color: var(--texto-secundario);
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+
+    .notif-acciones {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .btn-atender {
+      font-size: 0.75rem;
+      padding: 5px 12px;
+      border-radius: 6px;
+      background: var(--exito);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background var(--transicion);
+    }
+
+    .btn-atender:hover { background: #218838; }
+
+    /* ── CONFIGURACIÓN ── */
+    .config-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 860px;
+    }
+
+    .config-card {
+      background: var(--tarjeta);
+      border-radius: var(--radio);
+      border: 1px solid var(--borde);
+      box-shadow: var(--sombra);
+      padding: 24px;
+    }
+
+    .config-card h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .config-opcion {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--borde);
+    }
+
+    .config-opcion:last-child { border-bottom: none; }
+
+    .config-opcion label {
+      font-size: 0.88rem;
+      color: var(--texto);
+    }
+
+    .config-opcion small {
+      font-size: 0.76rem;
+      color: var(--texto-secundario);
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* Toggle switch */
+    .toggle {
+      width: 44px;
+      height: 24px;
+      background: var(--borde);
+      border-radius: 12px;
+      position: relative;
+      cursor: pointer;
+      transition: background var(--transicion);
+      border: none;
+      flex-shrink: 0;
+    }
+
+    .toggle.activo { background: var(--acento); }
+
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      top: 3px;
+      left: 3px;
+      transition: transform var(--transicion);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .toggle.activo::after {
+      transform: translateX(20px);
+    }
+
+    /* ── BARRA DE BÚSQUEDA ── */
+    .barra-busqueda {
+      position: relative;
+      max-width: 360px;
+    }
+
+    .barra-busqueda input {
+      width: 100%;
+      padding: 9px 14px 9px 38px;
+      border: 1px solid var(--borde);
+      border-radius: var(--radio-sm);
+      font-size: 0.85rem;
+      font-family: inherit;
+      background: var(--superficie);
+      color: var(--texto);
+      transition: all var(--transicion);
+    }
+
+    .barra-busqueda input:focus {
+      outline: none;
+      border-color: var(--acento);
+      background: var(--tarjeta);
+      box-shadow: 0 0 0 3px rgba(46,134,171,0.1);
+    }
+
+    .barra-busqueda::before {
+      content: '🔍';
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.85rem;
+    }
+
+    /* ── FILTROS ── */
+    .filtros-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      align-items: center;
+    }
+
+    .filtro-chip {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      border: 1px solid var(--borde);
+      background: var(--tarjeta);
+      color: var(--texto-secundario);
+      cursor: pointer;
+      transition: all var(--transicion);
+    }
+
+    .filtro-chip:hover, .filtro-chip.activo {
+      background: var(--acento);
+      color: #fff;
+      border-color: var(--acento);
+    }
+
+    /* ── VACÍO / EMPTY STATE ── */
+    .estado-vacio {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--texto-secundario);
+    }
+
+    .estado-vacio .icono-grande {
+      font-size: 3rem;
+      margin-bottom: 14px;
+      opacity: 0.5;
+    }
+
+    .estado-vacio p {
+      font-size: 0.92rem;
+      max-width: 340px;
+      margin: 0 auto;
+    }
+
+    /* ── OVERLAY MÓVIL ── */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 99;
+    }
+
+    .sidebar-overlay.visible { display: block; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1100px) {
+      .metricas-grid { grid-template-columns: repeat(2, 1fr); }
+      .dash-grid { grid-template-columns: 1fr; }
+      .config-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.abierto {
+        transform: translateX(0);
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .btn-menu-movil {
+        display: flex;
+      }
+
+      .contenido {
+        padding: 18px 14px;
+      }
+
+      .metricas-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      .metrica-card {
+        padding: 16px;
+      }
+
+      .metrica-valor {
+        font-size: 1.6rem;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header {
+        padding: 0 14px;
+      }
+
+      .header-titulo { font-size: 0.95rem; }
+    }
+
+    @media (max-width: 480px) {
+      .metricas-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .metrica-card { padding: 14px; }
+      .metrica-valor { font-size: 1.4rem; }
+      .urgencia-item { padding: 12px 14px; gap: 10px; }
+    }
+
+    /* ── IMPRESIÓN ── */
+    @media print {
+      .sidebar, .header, .btn, .btn-header { display: none !important; }
+      .main { margin-left: 0; }
+      .contenido { padding: 0; }
+      .panel { box-shadow: none; border: 1px solid #ccc; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- OVERLAY MÓVIL -->
+  <div class="sidebar-overlay" id="overlay" onclick="cerrarMenu()"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-escudo"><span>⚖️</span></div>
+      <div class="sidebar-despacho">
+        República de Colombia<br>
+        Rama Judicial del Poder Público<br>
+        Juzgado Catorce Penal Municipal<br>
+        con Función de Conocimiento<br>
+        Ibagué — Tolima
+      </div>
+    </div>
+
+    <div class="sidebar-brand">
+      <h1>SIGAJ</h1>
+      <small>Agenda Judicial Inteligente</small>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="sidebar-nav-item activo" onclick="navegar('dashboard', this)">
+        <span class="icono">📊</span> Dashboard
+        <span class="badge-nav" id="badge-vencidos">3</span>
+      </button>
+      <button class="sidebar-nav-item" onclick="navegar('eventos', this)">
+        <span class="icono">📋</span> Gestión de Eventos
+      </button>
+      <button class="sidebar-nav-item" onclick="navegar('nuevo', this)">
+        <span class="icono">➕</span> Nuevo Evento
+      </button>
+      <button class="sidebar-nav-item" onclick="navegar('notificaciones', this)">
+        <span class="icono">🔔</span> Notificaciones
+        <span class="badge-nav">5</span>
+      </button>
+      <button class="sidebar-nav-item" onclick="navegar('config', this)">
+        <span class="icono">⚙️</span> Configuración
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      SIGAJ v1.0 · 2026
+    </div>
+  </aside>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="main">
+
+    <!-- HEADER -->
+    <header class="header">
+      <button class="btn-menu-movil" onclick="abrirMenu()">☰</button>
+      <span class="header-titulo" id="header-titulo">📊 Dashboard</span>
+
+      <div class="header-acciones">
+        <div class="barra-busqueda">
+          <input type="text" placeholder="Buscar por radicado, tipo..." id="busqueda-global">
+        </div>
+        <button class="btn-header" onclick="navegar('notificaciones', document.querySelector('[data-pant=notificaciones]'))">
+          🔔 <span class="notif-dot"></span>
+        </button>
+        <button class="btn-header" onclick="navegar('nuevo', document.querySelector('[data-pant=nuevo]'))">
+          ➕ Nuevo
+        </button>
+      </div>
+    </header>
+
+    <div class="contenido">
+
+      <!-- ═══════ PANTALLA: DASHBOARD ═══════ -->
+      <section class="pantalla visible" id="pant-dashboard">
+
+        <!-- Métricas -->
+        <div class="metricas-grid">
+          <div class="metrica-card total">
+            <div class="metrica-icono">📁</div>
+            <div class="metrica-valor">24</div>
+            <div class="metrica-label">Eventos activos</div>
+          </div>
+          <div class="metrica-card ok">
+            <div class="metrica-icono">✅</div>
+            <div class="metrica-valor">15</div>
+            <div class="metrica-label">Al día</div>
+          </div>
+          <div class="metrica-card proximo">
+            <div class="metrica-icono">⏰</div>
+            <div class="metrica-valor">6</div>
+            <div class="metrica-label">Próximos a vencer</div>
+          </div>
+          <div class="metrica-card vencido">
+            <div class="metrica-icono">🔴</div>
+            <div class="metrica-valor">3</div>
+            <div class="metrica-label">VENCIDOS</div>
+          </div>
+        </div>
+
+        <!-- Grilla principal -->
+        <div class="dash-grid">
+
+          <!-- Urgencias -->
+          <div class="panel">
+            <div class="panel-header">
+              <h2>🚨 Eventos urgentes</h2>
+              <span style="font-size:0.78rem; color:var(--texto-secundario)">Top 10</span>
+            </div>
+            <div class="panel-body">
+              <div class="urgencia-item">
+                <div class="urgencia-estado rojo"></div>
+                <div class="urgencia-info">
+                  <div class="urgencia-radicado">2026-00142</div>
+                  <div class="urgencia-tipo">🛡️ Tutela — Fallo Primera Instancia</div>
+                </div>
+                <span class="urgencia-vence rojo">Vencido hace 2 días</span>
+              </div>
+              <div class="urgencia-item">
+                <div class="urgencia-estado rojo"></div>
+                <div class="urgencia-info">
+                  <div class="urgencia-radicado">2026-00189</div>
+                  <div class="urgencia-tipo">📩 Derecho de Petición</div>
+                </div>
+                <span class="urgencia-vence rojo">Vencido hace 1 día</span>
+              </div>
+              <div class="urgencia-item">
+                <div class="urgencia-estado rojo"></div>
+                <div class="urgencia-info">
+                  <div class="urgencia-radicado">2026-00201</div>
+                  <div class="urgencia-tipo">🔍 Vigilancia Judicial</div>
+                </div>
+                <span class="urgencia-vence rojo">Vence hoy</span>
+              </div>
+              <div class="urgencia-item">
+                <div class="urgencia-estado naranja"></div>
+                <div class="urgencia-info">
+                  <div class="urgencia-radicado">2026-00198</div>
+                  <div class="urgencia-tipo">⚖️ Recurso de Apelación</div>
+                </div>
+                <span class="urgencia-vence naranja">Vence mañana</span>
+              </div>
+              <div class="urgencia-item">
+                <div class="urgencia-estado amarillo"></div>
+                <div class="urgencia-info">
+                  <div class="urgencia-radicado">2026-00195</div>
+                  <div class="urgencia-tipo">⚠️ Incidente de Desacato</div>
+                </div>
+                <span class="urgencia-vence amarillo">Vence en 2 días</span>
+              </div>
+              <div class="urgencia-item">
+                <div class="urgencia-estado amarillo"></div>
+                <div class="urgencia-info">
+                  <div class="urgencia-radicado">2026-00210</div>
+                  <div class="urgencia-tipo">🛡️ Tutela en contra del Juzgado</div>
+                </div>
+                <span class="urgencia-vence amarillo">Vence en 2 días</span>
+              </div>
+              <div class="urgencia-item">
+                <div class="urgencia-estado verde"></div>
+                <div class="urgencia-info">
+                  <div class="urgencia-radicado">2026-00175</div>
+                  <div class="urgencia-tipo">📜 Ejecutoria de Sentencia Penal</div>
+                </div>
+                <span class="urgencia-vence verde">Vence en 4 días</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Calendario -->
+          <div class="panel">
+            <div class="panel-header">
+              <h2>🗓️ Calendario</h2>
+            </div>
+            <div class="calendario">
+              <div class="cal-header">
+                <button class="cal-nav-btn">◀</button>
+                <h3>Septiembre 2026</h3>
+                <button class="cal-nav-btn">▶</button>
+              </div>
+              <div class="cal-grid">
+                <div class="cal-dia-nombre">Lu</div>
+                <div class="cal-dia-nombre">Ma</div>
+                <div class="cal-dia-nombre">Mi</div>
+                <div class="cal-dia-nombre">Ju</div>
+                <div class="cal-dia-nombre">Vi</div>
+                <div class="cal-dia-nombre">Sa</div>
+                <div class="cal-dia-nombre">Do</div>
+
+                <div class="cal-dia otro-mes">31</div>
+                <div class="cal-dia">1</div>
+                <div class="cal-dia">2</div>
+                <div class="cal-dia">3</div>
+                <div class="cal-dia">4</div>
+                <div class="cal-dia">5</div>
+                <div class="cal-dia">6</div>
+
+                <div class="cal-dia">7</div>
+                <div class="cal-dia">8<div class="cal-dots"><span class="cal-dot" style="background:var(--peligro)"></span></div></div>
+                <div class="cal-dia">9</div>
+                <div class="cal-dia">10<div class="cal-dots"><span class="cal-dot" style="background:var(--advertencia)"></span></div></div>
+                <div class="cal-dia">11<div class="cal-dots"><span class="cal-dot" style="background:var(--peligro)"></span><span class="cal-dot" style="background:var(--advertencia)"></span></div></div>
+                <div class="cal-dia">12</div>
+                <div class="cal-dia hoy">13</div>
+
+                <div class="cal-dia">14<div class="cal-dots"><span class="cal-dot" style="background:var(--naranja)"></span></div></div>
+                <div class="cal-dia">15<div class="cal-dots"><span class="cal-dot" style="background:var(--advertencia)"></span></div></div>
+                <div class="cal-dia">16</div>
+                <div class="cal-dia">17<div class="cal-dots"><span class="cal-dot" style="background:var(--exito)"></span></div></div>
+                <div class="cal-dia">18</div>
+                <div class="cal-dia">19</div>
+                <div class="cal-dia">20</div>
+
+                <div class="cal-dia">21</div>
+                <div class="cal-dia">22<div class="cal-dots"><span class="cal-dot" style="background:var(--exito)"></span></div></div>
+                <div class="cal-dia">23</div>
+                <div class="cal-dia">24</div>
+                <div class="cal-dia">25<div class="cal-dots"><span class="cal-dot" style="background:var(--exito)"></span><span class="cal-dot" style="background:var(--exito)"></span></div></div>
+                <div class="cal-dia">26</div>
+                <div class="cal-dia">27</div>
+
+                <div class="cal-dia">28</div>
+                <div class="cal-dia">29</div>
+                <div class="cal-dia">30</div>
+                <div class="cal-dia otro-mes">1</div>
+                <div class="cal-dia otro-mes">2</div>
+                <div class="cal-dia otro-mes">3</div>
+                <div class="cal-dia otro-mes">4</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ═══════ PANTALLA: GESTIÓN DE EVENTOS ═══════ -->
+      <section class="pantalla" id="pant-eventos">
+        <div class="filtros-bar">
+          <span class="filtro-chip activo">Todos</span>
+          <span class="filtro-chip">🔴 Vencidos</span>
+          <span class="filtro-chip">🟡 Próximos</span>
+          <span class="filtro-chip">🟢 Al día</span>
+          <span class="filtro-chip">✅ Cumplidos</span>
+          <select class="form-control" style="max-width:220px;font-size:0.82rem;padding:7px 12px;">
+            <option value="">Todas las actuaciones</option>
+            <option>🛡️ Tutela — Fallo Primera Instancia</option>
+            <option>🛡️ Tutela en contra del Juzgado</option>
+            <option>🛡️ Tutela — Impugnación</option>
+            <option>📩 Derecho de Petición</option>
+            <option>⚖️ Recurso de Reposición</option>
+            <option>⚖️ Recurso de Apelación</option>
+            <option>📜 Ejecutoria de Sentencia Penal</option>
+            <option>💰 Incidente de Reparación Integral</option>
+            <option>🔍 Vigilancia Judicial</option>
+            <option>⚠️ Incidente de Desacato</option>
+            <option>🔒 Medida Cautelar</option>
+            <option>📤 Comisión / Despacho Comisorio</option>
+            <option>🏛️ Requerimiento de Ente de Control</option>
+            <option>📝 Solicitud General</option>
+          </select>
+        </div>
+
+        <div class="panel">
+          <div class="tabla-wrapper">
+            <table class="tabla-eventos">
+              <thead>
+                <tr>
+                  <th>Radicado</th>
+                  <th>Tipo</th>
+                  <th>Inicio</th>
+                  <th>Vence</th>
+                  <th>Días</th>
+                  <th>Estado</th>
+                  <th>Responsable</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="fila-vencida">
+                  <td><strong>2026-00142</strong></td>
+                  <td>🛡️ Tutela — Fallo 1ª Inst.</td>
+                  <td>28/ago/2026</td>
+                  <td>11/sep/2026</td>
+                  <td style="color:var(--peligro);font-weight:700">-2</td>
+                  <td><span class="estado-badge vencido">🔴 Vencido</span></td>
+                  <td>Sustanciador</td>
+                  <td><button class="btn btn-exito" style="padding:6px 12px;font-size:0.78rem">✅ Atender</button></td>
+                </tr>
+                <tr class="fila-vencida">
+                  <td><strong>2026-00189</strong></td>
+                  <td>📩 Derecho de Petición</td>
+                  <td>20/ago/2026</td>
+                  <td>12/sep/2026</td>
+                  <td style="color:var(--peligro);font-weight:700">-1</td>
+                  <td><span class="estado-badge vencido">🔴 Vencido</span></td>
+                  <td>Secretaria</td>
+                  <td><button class="btn btn-exito" style="padding:6px 12px;font-size:0.78rem">✅ Atender</button></td>
+                </tr>
+                <tr>
+                  <td><strong>2026-00198</strong></td>
+                  <td>⚖️ Recurso de Apelación</td>
+                  <td>10/sep/2026</td>
+                  <td>15/sep/2026</td>
+                  <td style="color:var(--naranja);font-weight:600">1</td>
+                  <td><span class="estado-badge pendiente">⏰ Pendiente</span></td>
+                  <td>Sustanciador</td>
+                  <td><button class="btn btn-secundario" style="padding:6px 12px;font-size:0.78rem">✏️ Editar</button></td>
+                </tr>
+                <tr>
+                  <td><strong>2026-00195</strong></td>
+                  <td>⚠️ Incidente de Desacato</td>
+                  <td>09/sep/2026</td>
+                  <td>16/sep/2026</td>
+                  <td style="color:var(--advertencia);font-weight:600">2</td>
+                  <td><span class="estado-badge pendiente">⏰ Pendiente</span></td>
+                  <td>Juez</td>
+                  <td><button class="btn btn-secundario" style="padding:6px 12px;font-size:0.78rem">✏️ Editar</button></td>
+                </tr>
+                <tr>
+                  <td><strong>2026-00175</strong></td>
+                  <td>📜 Ejecutoria Sent. Penal</td>
+                  <td>08/sep/2026</td>
+                  <td>18/sep/2026</td>
+                  <td style="color:var(--exito)">4</td>
+                  <td><span class="estado-badge en_tramite">📂 En trámite</span></td>
+                  <td>Secretaria</td>
+                  <td><button class="btn btn-secundario" style="padding:6px 12px;font-size:0.78rem">✏️ Editar</button></td>
+                </tr>
+                <tr>
+                  <td><strong>2026-00160</strong></td>
+                  <td>🛡️ Tutela en contra</td>
+                  <td>01/sep/2026</td>
+                  <td>03/sep/2026</td>
+                  <td style="color:var(--exito)">—</td>
+                  <td><span class="estado-badge cumplido">✅ Cumplido</span></td>
+                  <td>Juez</td>
+                  <td><button class="btn btn-secundario" style="padding:6px 12px;font-size:0.78rem">👁️ Ver</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════ PANTALLA: NUEVO EVENTO ═══════ -->
+      <section class="pantalla" id="pant-nuevo">
+        <div class="form-card">
+          <h2>➕ Registrar nuevo evento</h2>
+          <div class="form-grid">
+            <div class="form-grupo">
+              <label>Radicado *</label>
+              <input type="text" class="form-control" placeholder="Ej: 2026-00215">
+            </div>
+            <div class="form-grupo">
+              <label>Tipo de actuación *</label>
+              <select class="form-control">
+                <option value="">— Seleccionar —</option>
+                <option>🛡️ Tutela — Fallo Primera Instancia (10 días)</option>
+                <option>🛡️ Tutela en contra del Juzgado (2 días)</option>
+                <option>🛡️ Tutela — Impugnación (2 días)</option>
+                <option>📩 Derecho de Petición (15 días)</option>
+                <option>📩 Derecho de Petición — Información (10 días)</option>
+                <option>⚖️ Recurso de Reposición (3 días)</option>
+                <option>⚖️ Recurso de Apelación (3 días)</option>
+                <option>📜 Ejecutoria de Sentencia Penal (5 días)</option>
+                <option>💰 Incidente de Reparación Integral (30 días)</option>
+                <option>🔍 Vigilancia Judicial (5 días)</option>
+                <option>⚠️ Incidente de Desacato (3 días)</option>
+                <option>🔒 Medida Cautelar (1 día)</option>
+                <option>📤 Comisión / Despacho Comisorio (10 días)</option>
+                <option>🏛️ Requerimiento de Ente de Control (5 días)</option>
+                <option>📝 Solicitud General (15 días)</option>
+                <option>📌 Otro (10 días)</option>
+              </select>
+            </div>
+            <div class="form-grupo">
+              <label>Fecha de inicio del término *</label>
+              <input type="date" class="form-control">
+            </div>
+            <div class="form-grupo">
+              <label>Plazo (días hábiles) *</label>
+              <input type="number" class="form-control" placeholder="Auto-poblado" min="1">
+            </div>
+            <div class="form-grupo">
+              <label>Responsable</label>
+              <input type="text" class="form-control" placeholder="Ej: Sustanciador, Secretaria, Juez">
+            </div>
+            <div class="form-grupo">
+              <label>Prioridad</label>
+              <select class="form-control">
+                <option>Normal</option>
+                <option>Alta</option>
+                <option>Urgente</option>
+              </select>
+            </div>
+            <div class="form-grupo full">
+              <label>Descripción</label>
+              <textarea class="form-control" placeholder="Descripción libre del evento o la actuación..."></textarea>
+            </div>
+            <div class="form-grupo full">
+              <label>Notas</label>
+              <textarea class="form-control" placeholder="Observaciones adicionales..." style="min-height:60px;"></textarea>
+            </div>
+
+            <!-- Fecha de vencimiento calculada -->
+            <div class="form-vencimiento">
+              <span style="font-size:1.5rem">📅</span>
+              <div>
+                <div class="venc-label">Fecha de vencimiento calculada</div>
+                <div class="venc-fecha">Seleccione fecha de inicio y plazo</div>
+              </div>
+            </div>
+
+            <div class="form-acciones">
+              <button class="btn btn-secundario">Cancelar</button>
+              <button class="btn btn-primario">💾 Guardar evento</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════ PANTALLA: NOTIFICACIONES ═══════ -->
+      <section class="pantalla" id="pant-notificaciones">
+        <div class="filtros-bar" style="margin-bottom:14px;">
+          <span class="filtro-chip activo">Todas</span>
+          <span class="filtro-chip">No leídas</span>
+          <span class="filtro-chip">🔴 Vencimientos</span>
+          <span class="filtro-chip">⏰ Alertas</span>
+          <button class="btn btn-secundario" style="margin-left:auto;font-size:0.8rem;padding:6px 14px;">Marcar todas leídas</button>
+        </div>
+        <div class="panel">
+          <ul class="notif-lista panel-body" style="max-height:none;">
+            <li class="notif-item no-leida">
+              <span class="notif-icono">🔴</span>
+              <div class="notif-contenido">
+                <div class="notif-titulo">VENCIDO — Tutela 2026-00142</div>
+                <div class="notif-detalle">El término para fallar esta tutela venció hace 2 días hábiles. Acción inmediata requerida.</div>
+              </div>
+              <div class="notif-acciones">
+                <span class="notif-tiempo">Hace 10 min</span>
+                <button class="btn-atender">✅ Marcar atendida</button>
+              </div>
+            </li>
+            <li class="notif-item no-leida">
+              <span class="notif-icono">🔴</span>
+              <div class="notif-contenido">
+                <div class="notif-titulo">VENCIDO — D. Petición 2026-00189</div>
+                <div class="notif-detalle">El derecho de petición venció ayer. Riesgo de tutela por desacato.</div>
+              </div>
+              <div class="notif-acciones">
+                <span class="notif-tiempo">Hace 30 min</span>
+                <button class="btn-atender">✅ Marcar atendida</button>
+              </div>
+            </li>
+            <li class="notif-item no-leida">
+              <span class="notif-icono">🟠</span>
+              <div class="notif-contenido">
+                <div class="notif-titulo">Próximo a vencer — Recurso de Apelación 2026-00198</div>
+                <div class="notif-detalle">Vence mañana. Conceder y enviar a reparto al Tribunal Superior de Ibagué.</div>
+              </div>
+              <div class="notif-acciones">
+                <span class="notif-tiempo">Hace 1h</span>
+                <button class="btn-atender">✅ Marcar atendida</button>
+              </div>
+            </li>
+            <li class="notif-item">
+              <span class="notif-icono">🟡</span>
+              <div class="notif-contenido">
+                <div class="notif-titulo">Alerta — Desacato 2026-00195</div>
+                <div class="notif-detalle">Vence en 2 días hábiles. Correr traslado al accionado y resolver.</div>
+              </div>
+              <div class="notif-acciones">
+                <span class="notif-tiempo">Hace 3h</span>
+                <button class="btn-atender">✅ Marcar atendida</button>
+              </div>
+            </li>
+            <li class="notif-item">
+              <span class="notif-icono">✅</span>
+              <div class="notif-contenido">
+                <div class="notif-titulo">Cumplido — Tutela en contra 2026-00160</div>
+                <div class="notif-detalle">Contestación radicada dentro del término. Evento archivado.</div>
+              </div>
+              <div class="notif-acciones">
+                <span class="notif-tiempo">Ayer</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ═══════ PANTALLA: CONFIGURACIÓN ═══════ -->
+      <section class="pantalla" id="pant-config">
+        <div class="config-grid">
+          <div class="config-card">
+            <h3>🔔 Alertas</h3>
+            <div class="config-opcion">
+              <div>
+                <label>Sonido de alerta</label>
+                <small>Reproducir sonido para eventos vencidos</small>
+              </div>
+              <button class="toggle activo" onclick="this.classList.toggle('activo')"></button>
+            </div>
+            <div class="config-opcion">
+              <div>
+                <label>Notificaciones push</label>
+                <small>Recibir notificaciones del navegador</small>
+              </div>
+              <button class="toggle activo" onclick="this.classList.toggle('activo')"></button>
+            </div>
+            <div class="config-opcion">
+              <div>
+                <label>Días de anticipación</label>
+                <small>Días antes del vencimiento para alertar</small>
+              </div>
+              <input type="number" class="form-control" value="2" min="1" max="10" style="width:70px;text-align:center;padding:6px;">
+            </div>
+          </div>
+
+          <div class="config-card">
+            <h3>🎨 Apariencia</h3>
+            <div class="config-opcion">
+              <div>
+                <label>Tema oscuro</label>
+                <small>Cambiar entre tema claro y oscuro</small>
+              </div>
+              <button class="toggle" id="toggle-tema" onclick="toggleTema(this)"></button>
+            </div>
+          </div>
+
+          <div class="config-card">
+            <h3>📅 Festivos</h3>
+            <div class="config-opcion">
+              <div>
+                <label>Festivos colombianos 2026</label>
+                <small>18 festivos precargados (Ley 51/1983)</small>
+              </div>
+              <button class="btn btn-secundario" style="font-size:0.8rem;padding:6px 14px;">📋 Ver lista</button>
+            </div>
+            <div class="config-opcion">
+              <div>
+                <label>Festivos locales</label>
+                <small>Agregar festivos adicionales de Ibagué</small>
+              </div>
+              <button class="btn btn-secundario" style="font-size:0.8rem;padding:6px 14px;">➕ Agregar</button>
+            </div>
+          </div>
+
+          <div class="config-card">
+            <h3>💾 Datos</h3>
+            <div class="config-opcion">
+              <div>
+                <label>Exportar datos</label>
+                <small>Descargar todos los eventos en JSON</small>
+              </div>
+              <button class="btn btn-primario" style="font-size:0.8rem;padding:6px 14px;">📤 Exportar</button>
+            </div>
+            <div class="config-opcion">
+              <div>
+                <label>Importar datos</label>
+                <small>Restaurar desde archivo JSON</small>
+              </div>
+              <button class="btn btn-secundario" style="font-size:0.8rem;padding:6px 14px;">📥 Importar</button>
+            </div>
+            <div class="config-opcion">
+              <div>
+                <label>Reporte imprimible</label>
+                <small>Generar reporte para imprimir</small>
+              </div>
+              <button class="btn btn-secundario" style="font-size:0.8rem;padding:6px 14px;">🖨️ Imprimir</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ═══════ JAVASCRIPT — Navegación y UI ═══════ -->
+  <script>
+    /* ── Navegación entre pantallas ── */
+    const titulos = {
+      dashboard: '📊 Dashboard',
+      eventos: '📋 Gestión de Eventos',
+      nuevo: '➕ Nuevo Evento',
+      notificaciones: '🔔 Notificaciones',
+      config: '⚙️ Configuración'
+    };
+
+    function navegar(pantalla, boton) {
+      // Ocultar todas las pantallas
+      document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('visible'));
+      // Mostrar la seleccionada
+      const pant = document.getElementById('pant-' + pantalla);
+      if (pant) pant.classList.add('visible');
+
+      // Actualizar navegación activa
+      document.querySelectorAll('.sidebar-nav-item').forEach(b => b.classList.remove('activo'));
+      const navItems = document.querySelectorAll('.sidebar-nav-item');
+      const indice = { dashboard: 0, eventos: 1, nuevo: 2, notificaciones: 3, config: 4 };
+      if (navItems[indice[pantalla]]) navItems[indice[pantalla]].classList.add('activo');
+
+      // Actualizar título del header
+      document.getElementById('header-titulo').textContent = titulos[pantalla] || '';
+
+      // Cerrar menú en móvil
+      cerrarMenu();
+    }
+
+    /* ── Menú móvil ── */
+    function abrirMenu() {
+      document.getElementById('sidebar').classList.add('abierto');
+      document.getElementById('overlay').classList.add('visible');
+    }
+
+    function cerrarMenu() {
+      document.getElementById('sidebar').classList.remove('abierto');
+      document.getElementById('overlay').classList.remove('visible');
+    }
+
+    /* ── Tema oscuro ── */
+    function toggleTema(btn) {
+      btn.classList.toggle('activo');
+      const oscuro = btn.classList.contains('activo');
+      document.documentElement.setAttribute('data-tema', oscuro ? 'oscuro' : 'claro');
+    }
+
+    /* ── Filtros (chips) ── */
+    document.querySelectorAll('.filtros-bar').forEach(bar => {
+      bar.querySelectorAll('.filtro-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          bar.querySelectorAll('.filtro-chip').forEach(c => c.classList.remove('activo'));
+          chip.classList.add('activo');
+        });
+      });
+    });
+
+    /* ── Título de la pestaña con badge ── */
+    document.title = '(3) 🔴 SIGAJ — Agenda Judicial';
+
+    /* ── Registro del Service Worker (PWA) ── */
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('[SIGAJ] Service Worker registrado:', reg.scope))
+        .catch(err => console.warn('[SIGAJ] SW no registrado:', err));
+    }
+  </script>
+
+</body>
+</html>
