@@ -92,6 +92,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--t
 .cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;text-align:center}.cal-dn{font-size:.62rem;font-weight:700;color:var(--txt2);padding:4px 0;text-transform:uppercase;letter-spacing:.05em}
 .cal-d{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.76rem;border-radius:var(--rad);cursor:pointer;transition:all var(--trans);position:relative;color:var(--txt);font-weight:500}
 .cal-d:hover{background:linear-gradient(180deg,rgba(26,82,118,.08),rgba(26,82,118,.04));box-shadow:inset 0 0 0 1px rgba(26,82,118,.15)}
+.cal-d:focus-visible{outline:2px solid var(--accent);outline-offset:2px;background:linear-gradient(180deg,rgba(26,82,118,.10),rgba(26,82,118,.05))}
 .cal-d.hoy{background:linear-gradient(180deg,#2980b9,#1a5276);color:#fff;font-weight:700;box-shadow:0 2px 6px rgba(26,82,118,.4),inset 0 1px 0 rgba(255,255,255,.2);text-shadow:0 1px 2px rgba(0,0,0,.3)}
 .cal-d.om{color:var(--txt2);opacity:.3}.cal-d.festivo{color:var(--danger);font-weight:700}
 .cal-dots{display:flex;gap:2px;position:absolute;bottom:2px}.cal-dot{width:4px;height:4px;border-radius:50%;box-shadow:0 0 2px rgba(0,0,0,.3)}
@@ -171,7 +172,7 @@ textarea.fc{resize:vertical;min-height:64px;height:auto;padding:8px 12px}select.
 <button class="nav-btn" onclick="nav('notif',this)"><span class="ic">🔔</span>Notificaciones<span class="badge-n" id="bn" style="display:none">0</span></button>
 <button class="nav-btn" onclick="nav('cfg',this)"><span class="ic">⚙️</span>Configuración</button>
 </nav>
-<div class="side-foot">SIGAJ v3.0 · 2026</div>
+<div class="side-foot">SIGAJ v3.1 · 2026</div>
 </aside>
 <div class="main">
 <header class="head">
@@ -344,7 +345,7 @@ textarea.fc{resize:vertical;min-height:64px;height:auto;padding:8px 12px}select.
 
 <script>
 /* ============================================
-   SIGAJ v3.0 — LÓGICA COMPLETA + FIREBASE
+   SIGAJ v3.1 — LÓGICA COMPLETA + FIREBASE
    Juzgado 14 Penal Municipal — Ibagué
    ============================================ */
 
@@ -823,6 +824,19 @@ function renderDashboard(){
 // ── RENDER: CALENDARIO ──
 let calMes=new Date().getMonth(),calAnio=new Date().getFullYear();
 function moverMes(d){calMes+=d;if(calMes>11){calMes=0;calAnio++}if(calMes<0){calMes=11;calAnio--}renderCalendario()}
+
+// Abrir el formulario de nuevo evento desde un día del calendario.
+// La fecha seleccionada se usa como fecha de inicio del término; el vencimiento
+// seguirá calculándose automáticamente según el tipo de actuación y los días hábiles.
+function abrirNuevoDesdeCalendario(fechaISO){
+  nav('new');
+  document.getElementById('ev-fecha').value=fechaISO;
+  calcVenc();
+  const fechaLegible=fmtCorta(fechaISO);
+  toast('📅 Fecha de inicio preseleccionada: '+fechaLegible);
+  setTimeout(()=>document.getElementById('ev-rad')?.focus(),80);
+}
+
 function renderCalendario(){
   const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   document.getElementById('cal-titulo').textContent=meses[calMes]+' '+calAnio;
@@ -835,7 +849,12 @@ function renderCalendario(){
   const hoy=new Date();hoy.setHours(0,0,0,0);
   // Días del mes anterior
   const diasMesAnt=new Date(calAnio,calMes,0).getDate();
-  for(let i=startDay-1;i>=0;i--)grid.innerHTML+=`<div class="cal-d om">${diasMesAnt-i}</div>`;
+  for(let i=startDay-1;i>=0;i--){
+    const dia=diasMesAnt-i;
+    const fechaAnt=new Date(calAnio,calMes-1,dia);
+    const isoAnt=fmt(fechaAnt);
+    grid.innerHTML+=`<div class="cal-d om" role="button" tabindex="0" title="Crear evento con fecha de inicio ${fmtCorta(fechaAnt)}" onclick="abrirNuevoDesdeCalendario('${isoAnt}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirNuevoDesdeCalendario('${isoAnt}')}">${dia}</div>`;
+  }
   // Días del mes
   for(let d=1;d<=diasMes;d++){
     const fecha=new Date(calAnio,calMes,d);const fs=fmt(fecha);
@@ -844,11 +863,15 @@ function renderCalendario(){
     const evsDelDia=evs.filter(e=>e.fechaVencimiento===fs);
     let dots='';
     evsDelDia.forEach(e=>{const st=estadoEvento(e);const col={ok:'var(--ok)',proximo:'var(--warn)',critico:'var(--orange)',vencido:'var(--danger)'}[st]||'var(--ok)';dots+=`<span class="cal-dot" style="background:${col}"></span>`});
-    grid.innerHTML+=`<div class="cal-d${esHoy?' hoy':''}${esFest?' festivo':''}">${d}${dots?`<div class="cal-dots">${dots}</div>`:''}</div>`;
+    grid.innerHTML+=`<div class="cal-d${esHoy?' hoy':''}${esFest?' festivo':''}" role="button" tabindex="0" title="Crear evento con fecha de inicio ${fmtCorta(fecha)}" onclick="abrirNuevoDesdeCalendario('${fs}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirNuevoDesdeCalendario('${fs}')}">${d}${dots?`<div class="cal-dots">${dots}</div>`:''}</div>`;
   }
   // Días del mes siguiente
   const totalCeldas=startDay+diasMes;const restantes=totalCeldas%7===0?0:7-totalCeldas%7;
-  for(let i=1;i<=restantes;i++)grid.innerHTML+=`<div class="cal-d om">${i}</div>`;
+  for(let i=1;i<=restantes;i++){
+    const fechaSig=new Date(calAnio,calMes+1,i);
+    const isoSig=fmt(fechaSig);
+    grid.innerHTML+=`<div class="cal-d om" role="button" tabindex="0" title="Crear evento con fecha de inicio ${fmtCorta(fechaSig)}" onclick="abrirNuevoDesdeCalendario('${isoSig}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();abrirNuevoDesdeCalendario('${isoSig}')}">${i}</div>`;
+  }
 }
 
 // ── NOTIFICACIONES ──

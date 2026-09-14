@@ -1,10 +1,10 @@
 /* ============================================
-   SIGAJ — Service Worker v3.0
+   SIGAJ — Service Worker v3.1
    Agenda Judicial Inteligente
    Juzgado 14 Penal Municipal — Ibagué
    ============================================ */
 
-const CACHE_NAME = 'sigaj-v3-firebase-20260913';
+const CACHE_NAME = 'sigaj-v3.1-calendario-20260913';
 const APP_SHELL = [
   './',
   './index.html',
