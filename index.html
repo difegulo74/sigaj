@@ -1,1713 +1,1122 @@
 <!DOCTYPE html>
 <html lang="es-CO">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#1B2A4A">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>SIGAJ — Agenda Judicial Inteligente</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231B2A4A'/><text x='50' y='68' text-anchor='middle' font-size='36'>⚖️</text></svg>">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    /* ========================================
-       SIGAJ — Sistema Inteligente de Gestión
-       de Agenda Judicial
-       Juzgado 14 Penal Municipal — Ibagué
-       ======================================== */
-
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    :root {
-      --primario: #1B2A4A;
-      --primario-claro: #2a3f6b;
-      --acento: #2E86AB;
-      --acento-hover: #247a9d;
-      --exito: #28A745;
-      --exito-suave: #e8f5eb;
-      --advertencia: #F0AD4E;
-      --advertencia-suave: #fef5e7;
-      --peligro: #DC3545;
-      --peligro-suave: #fce8ea;
-      --naranja: #E8762B;
-      --naranja-suave: #fdf0e6;
-      --superficie: #F3F5F8;
-      --tarjeta: #FFFFFF;
-      --texto: #1a1a2e;
-      --texto-secundario: #5a6275;
-      --borde: #e2e5ec;
-      --sombra: 0 2px 8px rgba(27,42,74,0.07);
-      --sombra-elevada: 0 8px 24px rgba(27,42,74,0.12);
-      --radio: 12px;
-      --radio-sm: 8px;
-      --transicion: 280ms ease;
-      --sidebar-ancho: 260px;
-      --header-alto: 64px;
-    }
-
-    /* Tema oscuro */
-    [data-tema="oscuro"] {
-      --primario: #0f1a2e;
-      --primario-claro: #1a2d50;
-      --superficie: #0d1117;
-      --tarjeta: #161b22;
-      --texto: #e6edf3;
-      --texto-secundario: #8b949e;
-      --borde: #30363d;
-      --sombra: 0 2px 8px rgba(0,0,0,0.3);
-      --sombra-elevada: 0 8px 24px rgba(0,0,0,0.4);
-    }
-
-    html {
-      font-size: 16px;
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: var(--superficie);
-      color: var(--texto);
-      line-height: 1.55;
-      min-height: 100vh;
-      display: flex;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── ANIMACIONES ── */
-    @keyframes pulso-peligro {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(220,53,69,0.35); }
-      50% { box-shadow: 0 0 0 10px rgba(220,53,69,0); }
-    }
-
-    @keyframes pulso-badge {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.15); }
-    }
-
-    @keyframes entrada-arriba {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes shimmer {
-      from { opacity: 0.5; }
-      to { opacity: 1; }
-    }
-
-    /* ── SIDEBAR ── */
-    .sidebar {
-      width: var(--sidebar-ancho);
-      background: var(--primario);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      z-index: 100;
-      transition: transform var(--transicion);
-      overflow-y: auto;
-    }
-
-    .sidebar-header {
-      padding: 24px 20px 20px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .sidebar-escudo {
-      text-align: center;
-      margin-bottom: 12px;
-    }
-
-    .sidebar-escudo span {
-      font-size: 2.2rem;
-    }
-
-    .sidebar-despacho {
-      text-align: center;
-      font-size: 0.65rem;
-      letter-spacing: 0.06em;
-      line-height: 1.6;
-      color: rgba(255,255,255,0.6);
-      text-transform: uppercase;
-      font-weight: 500;
-    }
-
-    .sidebar-brand {
-      text-align: center;
-      padding: 16px 20px;
-    }
-
-    .sidebar-brand h1 {
-      font-size: 1.35rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-
-    .sidebar-brand small {
-      font-size: 0.72rem;
-      color: rgba(255,255,255,0.5);
-      display: block;
-      margin-top: 2px;
-    }
-
-    .sidebar-nav {
-      flex: 1;
-      padding: 12px 10px;
-    }
-
-    .sidebar-nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      border-radius: var(--radio-sm);
-      color: rgba(255,255,255,0.7);
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all var(--transicion);
-      border: none;
-      background: none;
-      width: 100%;
-      text-align: left;
-    }
-
-    .sidebar-nav-item:hover {
-      background: rgba(255,255,255,0.08);
-      color: #fff;
-    }
-
-    .sidebar-nav-item.activo {
-      background: var(--acento);
-      color: #fff;
-    }
-
-    .sidebar-nav-item .icono {
-      font-size: 1.15rem;
-      width: 24px;
-      text-align: center;
-    }
-
-    .sidebar-nav-item .badge-nav {
-      margin-left: auto;
-      background: var(--peligro);
-      color: #fff;
-      font-size: 0.7rem;
-      font-weight: 700;
-      min-width: 22px;
-      height: 22px;
-      border-radius: 11px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 6px;
-      animation: pulso-badge 1.8s ease infinite;
-    }
-
-    .sidebar-footer {
-      padding: 16px 20px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      font-size: 0.72rem;
-      color: rgba(255,255,255,0.35);
-      text-align: center;
-    }
-
-    /* ── MAIN CONTENT ── */
-    .main {
-      flex: 1;
-      margin-left: var(--sidebar-ancho);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    /* ── HEADER ── */
-    .header {
-      height: var(--header-alto);
-      background: var(--tarjeta);
-      border-bottom: 1px solid var(--borde);
-      display: flex;
-      align-items: center;
-      padding: 0 28px;
-      gap: 16px;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-
-    .btn-menu-movil {
-      display: none;
-      background: none;
-      border: none;
-      font-size: 1.4rem;
-      cursor: pointer;
-      padding: 6px;
-      color: var(--texto);
-    }
-
-    .header-titulo {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--texto);
-    }
-
-    .header-acciones {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-header {
-      background: none;
-      border: 1px solid var(--borde);
-      border-radius: var(--radio-sm);
-      padding: 8px 12px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      color: var(--texto-secundario);
-      transition: all var(--transicion);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .btn-header:hover {
-      background: var(--superficie);
-      border-color: var(--acento);
-      color: var(--acento);
-    }
-
-    .btn-header .notif-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--peligro);
-      animation: pulso-badge 1.8s ease infinite;
-    }
-
-    /* ── CONTENIDO ── */
-    .contenido {
-      flex: 1;
-      padding: 28px;
-    }
-
-    .pantalla {
-      display: none;
-      animation: entrada-arriba 350ms ease;
-    }
-
-    .pantalla.visible {
-      display: block;
-    }
-
-    /* ── TARJETAS MÉTRICAS ── */
-    .metricas-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 18px;
-      margin-bottom: 28px;
-    }
-
-    .metrica-card {
-      background: var(--tarjeta);
-      border-radius: var(--radio);
-      padding: 22px;
-      border: 1px solid var(--borde);
-      box-shadow: var(--sombra);
-      transition: all var(--transicion);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .metrica-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-    }
-
-    .metrica-card:hover {
-      box-shadow: var(--sombra-elevada);
-      transform: translateY(-2px);
-    }
-
-    .metrica-card.total::before { background: var(--acento); }
-    .metrica-card.ok::before { background: var(--exito); }
-    .metrica-card.proximo::before { background: var(--advertencia); }
-    .metrica-card.vencido::before { background: var(--peligro); }
-
-    .metrica-card.vencido {
-      animation: pulso-peligro 2s ease infinite;
-    }
-
-    .metrica-icono {
-      font-size: 1.6rem;
-      margin-bottom: 8px;
-    }
-
-    .metrica-valor {
-      font-size: 2rem;
-      font-weight: 700;
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-
-    .metrica-card.total .metrica-valor { color: var(--acento); }
-    .metrica-card.ok .metrica-valor { color: var(--exito); }
-    .metrica-card.proximo .metrica-valor { color: var(--advertencia); }
-    .metrica-card.vencido .metrica-valor { color: var(--peligro); }
-
-    .metrica-label {
-      font-size: 0.8rem;
-      color: var(--texto-secundario);
-      font-weight: 500;
-    }
-
-    /* ── SECCIONES DEL DASHBOARD ── */
-    .dash-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-    }
-
-    .panel {
-      background: var(--tarjeta);
-      border-radius: var(--radio);
-      border: 1px solid var(--borde);
-      box-shadow: var(--sombra);
-      overflow: hidden;
-    }
-
-    .panel-header {
-      padding: 18px 22px;
-      border-bottom: 1px solid var(--borde);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .panel-header h2 {
-      font-size: 0.95rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .panel-body {
-      padding: 6px 0;
-      max-height: 420px;
-      overflow-y: auto;
-    }
-
-    /* ── LISTA DE URGENCIAS ── */
-    .urgencia-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 22px;
-      border-bottom: 1px solid var(--borde);
-      transition: background var(--transicion);
-      cursor: pointer;
-    }
-
-    .urgencia-item:last-child { border-bottom: none; }
-    .urgencia-item:hover { background: var(--superficie); }
-
-    .urgencia-estado {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .urgencia-estado.verde { background: var(--exito); }
-    .urgencia-estado.amarillo { background: var(--advertencia); }
-    .urgencia-estado.naranja { background: var(--naranja); }
-    .urgencia-estado.rojo {
-      background: var(--peligro);
-      animation: pulso-peligro 2s ease infinite;
-    }
-
-    .urgencia-info { flex: 1; min-width: 0; }
-
-    .urgencia-radicado {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--texto);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .urgencia-tipo {
-      font-size: 0.78rem;
-      color: var(--texto-secundario);
-    }
-
-    .urgencia-vence {
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 20px;
-      white-space: nowrap;
-    }
-
-    .urgencia-vence.verde { background: var(--exito-suave); color: #1a7a31; }
-    .urgencia-vence.amarillo { background: var(--advertencia-suave); color: #9a6b12; }
-    .urgencia-vence.naranja { background: var(--naranja-suave); color: #b85a14; }
-    .urgencia-vence.rojo { background: var(--peligro-suave); color: #b52030; font-weight: 700; }
-
-    /* ── CALENDARIO MINI ── */
-    .calendario {
-      padding: 16px 22px;
-    }
-
-    .cal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-
-    .cal-header h3 {
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-
-    .cal-nav-btn {
-      background: none;
-      border: 1px solid var(--borde);
-      border-radius: 6px;
-      width: 30px;
-      height: 30px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--texto-secundario);
-      transition: all var(--transicion);
-    }
-
-    .cal-nav-btn:hover {
-      background: var(--superficie);
-      color: var(--acento);
-    }
-
-    .cal-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 2px;
-      text-align: center;
-    }
-
-    .cal-dia-nombre {
-      font-size: 0.68rem;
-      font-weight: 600;
-      color: var(--texto-secundario);
-      padding: 6px 0;
-      text-transform: uppercase;
-    }
-
-    .cal-dia {
-      aspect-ratio: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background var(--transicion);
-      position: relative;
-      color: var(--texto);
-    }
-
-    .cal-dia:hover { background: var(--superficie); }
-    .cal-dia.hoy {
-      background: var(--acento);
-      color: #fff;
-      font-weight: 700;
-    }
-
-    .cal-dia.otro-mes { color: var(--texto-secundario); opacity: 0.4; }
-
-    .cal-dia .cal-dots {
-      display: flex;
-      gap: 2px;
-      position: absolute;
-      bottom: 3px;
-    }
-
-    .cal-dia .cal-dot {
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-    }
-
-    /* ── FORMULARIO DE EVENTOS ── */
-    .form-card {
-      background: var(--tarjeta);
-      border-radius: var(--radio);
-      border: 1px solid var(--borde);
-      box-shadow: var(--sombra);
-      padding: 28px;
-      max-width: 780px;
-    }
-
-    .form-card h2 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-
-    .form-grupo {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-
-    .form-grupo.full { grid-column: 1 / -1; }
-
-    .form-grupo label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--texto-secundario);
-    }
-
-    .form-control {
-      border: 1px solid var(--borde);
-      border-radius: var(--radio-sm);
-      padding: 10px 14px;
-      font-size: 0.9rem;
-      font-family: inherit;
-      color: var(--texto);
-      background: var(--tarjeta);
-      transition: border-color var(--transicion), box-shadow var(--transicion);
-      width: 100%;
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: var(--acento);
-      box-shadow: 0 0 0 3px rgba(46,134,171,0.12);
-    }
-
-    textarea.form-control {
-      resize: vertical;
-      min-height: 80px;
-    }
-
-    .form-vencimiento {
-      background: var(--superficie);
-      border-radius: var(--radio-sm);
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      grid-column: 1 / -1;
-    }
-
-    .form-vencimiento .venc-fecha {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: var(--acento);
-    }
-
-    .form-vencimiento .venc-label {
-      font-size: 0.8rem;
-      color: var(--texto-secundario);
-    }
-
-    .form-acciones {
-      grid-column: 1 / -1;
-      display: flex;
-      gap: 12px;
-      justify-content: flex-end;
-      margin-top: 10px;
-    }
-
-    /* ── BOTONES ── */
-    .btn {
-      padding: 10px 22px;
-      border-radius: var(--radio-sm);
-      font-size: 0.88rem;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      border: none;
-      transition: all var(--transicion);
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .btn-primario {
-      background: var(--acento);
-      color: #fff;
-    }
-
-    .btn-primario:hover {
-      background: var(--acento-hover);
-      box-shadow: 0 4px 12px rgba(46,134,171,0.25);
-    }
-
-    .btn-secundario {
-      background: transparent;
-      color: var(--texto-secundario);
-      border: 1px solid var(--borde);
-    }
-
-    .btn-secundario:hover {
-      background: var(--superficie);
-      color: var(--texto);
-    }
-
-    .btn-peligro {
-      background: var(--peligro);
-      color: #fff;
-    }
-
-    .btn-peligro:hover {
-      background: #c82333;
-    }
-
-    .btn-exito {
-      background: var(--exito);
-      color: #fff;
-    }
-
-    .btn-exito:hover {
-      background: #218838;
-    }
-
-    /* ── TABLA DE EVENTOS ── */
-    .tabla-wrapper {
-      overflow-x: auto;
-      margin-top: 20px;
-    }
-
-    .tabla-eventos {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-    }
-
-    .tabla-eventos th {
-      background: var(--superficie);
-      padding: 12px 16px;
-      text-align: left;
-      font-weight: 600;
-      color: var(--texto-secundario);
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      border-bottom: 2px solid var(--borde);
-      position: sticky;
-      top: 0;
-    }
-
-    .tabla-eventos td {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--borde);
-      vertical-align: middle;
-    }
-
-    .tabla-eventos tr:hover td {
-      background: var(--superficie);
-    }
-
-    .tabla-eventos tr.fila-vencida td {
-      background: var(--peligro-suave);
-    }
-
-    .tabla-eventos tr.fila-vencida {
-      animation: pulso-peligro 2.5s ease infinite;
-    }
-
-    .estado-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.76rem;
-      font-weight: 600;
-    }
-
-    .estado-badge.pendiente { background: var(--advertencia-suave); color: #9a6b12; }
-    .estado-badge.en_tramite { background: #e3f0ff; color: #1a5fa8; }
-    .estado-badge.cumplido { background: var(--exito-suave); color: #1a7a31; }
-    .estado-badge.vencido { background: var(--peligro-suave); color: #b52030; }
-
-    /* ── NOTIFICACIONES ── */
-    .notif-lista { list-style: none; }
-
-    .notif-item {
-      display: flex;
-      gap: 14px;
-      padding: 16px 22px;
-      border-bottom: 1px solid var(--borde);
-      transition: background var(--transicion);
-    }
-
-    .notif-item:hover { background: var(--superficie); }
-
-    .notif-item.no-leida {
-      background: rgba(46,134,171,0.04);
-      border-left: 3px solid var(--acento);
-    }
-
-    .notif-icono {
-      font-size: 1.5rem;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .notif-contenido { flex: 1; }
-
-    .notif-titulo {
-      font-size: 0.88rem;
-      font-weight: 600;
-      margin-bottom: 3px;
-    }
-
-    .notif-detalle {
-      font-size: 0.8rem;
-      color: var(--texto-secundario);
-    }
-
-    .notif-tiempo {
-      font-size: 0.72rem;
-      color: var(--texto-secundario);
-      white-space: nowrap;
-      margin-top: 2px;
-    }
-
-    .notif-acciones {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 6px;
-    }
-
-    .btn-atender {
-      font-size: 0.75rem;
-      padding: 5px 12px;
-      border-radius: 6px;
-      background: var(--exito);
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background var(--transicion);
-    }
-
-    .btn-atender:hover { background: #218838; }
-
-    /* ── CONFIGURACIÓN ── */
-    .config-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      max-width: 860px;
-    }
-
-    .config-card {
-      background: var(--tarjeta);
-      border-radius: var(--radio);
-      border: 1px solid var(--borde);
-      box-shadow: var(--sombra);
-      padding: 24px;
-    }
-
-    .config-card h3 {
-      font-size: 0.95rem;
-      font-weight: 700;
-      margin-bottom: 18px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .config-opcion {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--borde);
-    }
-
-    .config-opcion:last-child { border-bottom: none; }
-
-    .config-opcion label {
-      font-size: 0.88rem;
-      color: var(--texto);
-    }
-
-    .config-opcion small {
-      font-size: 0.76rem;
-      color: var(--texto-secundario);
-      display: block;
-      margin-top: 2px;
-    }
-
-    /* Toggle switch */
-    .toggle {
-      width: 44px;
-      height: 24px;
-      background: var(--borde);
-      border-radius: 12px;
-      position: relative;
-      cursor: pointer;
-      transition: background var(--transicion);
-      border: none;
-      flex-shrink: 0;
-    }
-
-    .toggle.activo { background: var(--acento); }
-
-    .toggle::after {
-      content: '';
-      position: absolute;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: #fff;
-      top: 3px;
-      left: 3px;
-      transition: transform var(--transicion);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    }
-
-    .toggle.activo::after {
-      transform: translateX(20px);
-    }
-
-    /* ── BARRA DE BÚSQUEDA ── */
-    .barra-busqueda {
-      position: relative;
-      max-width: 360px;
-    }
-
-    .barra-busqueda input {
-      width: 100%;
-      padding: 9px 14px 9px 38px;
-      border: 1px solid var(--borde);
-      border-radius: var(--radio-sm);
-      font-size: 0.85rem;
-      font-family: inherit;
-      background: var(--superficie);
-      color: var(--texto);
-      transition: all var(--transicion);
-    }
-
-    .barra-busqueda input:focus {
-      outline: none;
-      border-color: var(--acento);
-      background: var(--tarjeta);
-      box-shadow: 0 0 0 3px rgba(46,134,171,0.1);
-    }
-
-    .barra-busqueda::before {
-      content: '🔍';
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 0.85rem;
-    }
-
-    /* ── FILTROS ── */
-    .filtros-bar {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 18px;
-      align-items: center;
-    }
-
-    .filtro-chip {
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.78rem;
-      font-weight: 500;
-      border: 1px solid var(--borde);
-      background: var(--tarjeta);
-      color: var(--texto-secundario);
-      cursor: pointer;
-      transition: all var(--transicion);
-    }
-
-    .filtro-chip:hover, .filtro-chip.activo {
-      background: var(--acento);
-      color: #fff;
-      border-color: var(--acento);
-    }
-
-    /* ── VACÍO / EMPTY STATE ── */
-    .estado-vacio {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--texto-secundario);
-    }
-
-    .estado-vacio .icono-grande {
-      font-size: 3rem;
-      margin-bottom: 14px;
-      opacity: 0.5;
-    }
-
-    .estado-vacio p {
-      font-size: 0.92rem;
-      max-width: 340px;
-      margin: 0 auto;
-    }
-
-    /* ── OVERLAY MÓVIL ── */
-    .sidebar-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-      z-index: 99;
-    }
-
-    .sidebar-overlay.visible { display: block; }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 1100px) {
-      .metricas-grid { grid-template-columns: repeat(2, 1fr); }
-      .dash-grid { grid-template-columns: 1fr; }
-      .config-grid { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 768px) {
-      .sidebar {
-        transform: translateX(-100%);
-      }
-
-      .sidebar.abierto {
-        transform: translateX(0);
-      }
-
-      .main {
-        margin-left: 0;
-      }
-
-      .btn-menu-movil {
-        display: flex;
-      }
-
-      .contenido {
-        padding: 18px 14px;
-      }
-
-      .metricas-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-      }
-
-      .metrica-card {
-        padding: 16px;
-      }
-
-      .metrica-valor {
-        font-size: 1.6rem;
-      }
-
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .header {
-        padding: 0 14px;
-      }
-
-      .header-titulo { font-size: 0.95rem; }
-    }
-
-    @media (max-width: 480px) {
-      .metricas-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-      .metrica-card { padding: 14px; }
-      .metrica-valor { font-size: 1.4rem; }
-      .urgencia-item { padding: 12px 14px; gap: 10px; }
-    }
-
-    /* ── IMPRESIÓN ── */
-    @media print {
-      .sidebar, .header, .btn, .btn-header { display: none !important; }
-      .main { margin-left: 0; }
-      .contenido { padding: 0; }
-      .panel { box-shadow: none; border: 1px solid #ccc; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1B2A4A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>SIGAJ — Agenda Judicial Inteligente</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   SIGAJ v2.0 — Estilo institucional 3D
+   Rama Judicial — Juzgado 14 Penal Municipal
+   ═══════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--pri:#162544;--pri-l:#1e3460;--acc:#1a5276;--acc-h:#154360;
+--ok:#27783d;--ok-s:#e6f4ea;--warn:#c17d10;--warn-s:#fdf3e0;
+--danger:#b71c1c;--danger-s:#fde8e8;--orange:#bf5b00;--orange-s:#fef0e1;
+--bg:#d8dde5;--card:#f0f2f5;--txt:#1c2331;--txt2:#546178;
+--border:#b0b9c6;--border-dark:#8a95a5;
+--rad:5px;--trans:200ms ease;--side-w:250px;--head-h:50px;--btn-h:38px;
+--bevel-light:rgba(255,255,255,.55);--bevel-dark:rgba(0,0,0,.25);
+--depth-card:0 3px 8px rgba(0,0,0,.18),0 1px 2px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.6);
+--depth-panel:0 4px 12px rgba(0,0,0,.2),0 1px 3px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.5);
+--pressed:inset 0 2px 4px rgba(0,0,0,.3),inset 0 0 2px rgba(0,0,0,.1);
+}
+[data-tema="oscuro"]{--pri:#0b1420;--pri-l:#14233d;--bg:#1a2030;--card:#232b3a;--txt:#d4dce8;--txt2:#8a9bb2;--border:#3a4758;--border-dark:#4d5c70;--bevel-light:rgba(255,255,255,.08);--bevel-dark:rgba(0,0,0,.5);--depth-card:0 3px 8px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.05);--depth-panel:0 4px 12px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.04)}
+html{font-size:15px;scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5;min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;background-image:linear-gradient(135deg,rgba(0,0,0,.03) 25%,transparent 25%,transparent 75%,rgba(0,0,0,.03) 75%),linear-gradient(135deg,rgba(0,0,0,.03) 25%,transparent 25%,transparent 75%,rgba(0,0,0,.03) 75%);background-size:20px 20px;background-position:0 0,10px 10px}
+@keyframes pulse-red{0%,100%{box-shadow:var(--depth-card),0 0 0 0 rgba(183,28,28,.4)}50%{box-shadow:var(--depth-card),0 0 0 10px rgba(183,28,28,0)}}
+@keyframes pulse-badge{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.side{width:var(--side-w);background:linear-gradient(180deg,#0c1828,#152340 50%,#1a2d52);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform var(--trans);overflow-y:auto;box-shadow:4px 0 20px rgba(0,0,0,.5),2px 0 6px rgba(0,0,0,.3),inset -1px 0 0 rgba(255,255,255,.04);border-right:1px solid rgba(255,255,255,.03)}
+.side-head{padding:18px 14px 14px;border-bottom:1px solid rgba(255,255,255,.1);text-align:center;background:linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.05))}
+.side-head .esc{font-size:2rem;margin-bottom:6px;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.side-desp{font-size:.58rem;letter-spacing:.06em;line-height:1.65;color:rgba(255,255,255,.55);text-transform:uppercase;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.side-brand{text-align:center;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(255,255,255,.03),transparent)}
+.side-brand h1{font-size:1.25rem;font-weight:700;letter-spacing:.1em;text-shadow:0 2px 6px rgba(0,0,0,.5),0 0 20px rgba(46,134,171,.2)}
+.side-brand small{font-size:.68rem;color:rgba(255,255,255,.4);display:block;margin-top:2px}
+.side-nav{flex:1;padding:10px 8px}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:0 14px;height:var(--btn-h);border-radius:var(--rad);color:rgba(255,255,255,.65);font-size:.84rem;font-weight:500;cursor:pointer;transition:all var(--trans);border:1px solid transparent;background:transparent;width:100%;text-align:left;font-family:inherit;text-shadow:0 1px 2px rgba(0,0,0,.3)}
+.nav-btn:hover{background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03));color:#fff;border-color:rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 1px 3px rgba(0,0,0,.2)}
+.nav-btn.on{background:linear-gradient(180deg,#1f6a8f,#155070);color:#fff;font-weight:600;border-color:rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 2px 6px rgba(0,0,0,.35);text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.nav-btn.on:active{box-shadow:var(--pressed);transform:translateY(1px)}
+.nav-btn .ic{font-size:1rem;width:22px;text-align:center}
+.badge-n{margin-left:auto;background:linear-gradient(180deg,#d32f2f,#b71c1c);color:#fff;font-size:.65rem;font-weight:700;min-width:20px;height:20px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 5px;animation:pulse-badge 2s ease infinite;box-shadow:0 2px 4px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.2);text-shadow:0 1px 1px rgba(0,0,0,.3)}
+.side-foot{padding:12px 14px;border-top:1px solid rgba(255,255,255,.08);font-size:.65rem;color:rgba(255,255,255,.22);text-align:center}
+.main{flex:1;margin-left:var(--side-w);display:flex;flex-direction:column;min-height:100vh}
+.head{height:var(--head-h);background:linear-gradient(180deg,#f4f6f9,#e8eaef);border-bottom:1px solid var(--border);box-shadow:0 2px 6px rgba(0,0,0,.12),inset 0 -1px 0 rgba(0,0,0,.06),inset 0 1px 0 rgba(255,255,255,.8);display:flex;align-items:center;padding:0 20px;gap:12px;position:sticky;top:0;z-index:50}
+.btn-ham{display:none;background:none;border:none;font-size:1.2rem;cursor:pointer;padding:4px;color:var(--txt)}
+.head-t{font-size:.92rem;font-weight:700;color:var(--pri);text-shadow:0 1px 0 rgba(255,255,255,.7)}
+.head-act{margin-left:auto;display:flex;align-items:center;gap:6px}
+.search-box{position:relative}
+.search-box input{width:200px;padding:0 10px 0 32px;height:var(--btn-h);border:1px solid var(--border);border-radius:var(--rad);font-size:.82rem;font-family:inherit;color:var(--txt);transition:all var(--trans);background:linear-gradient(180deg,#fff,#f2f3f6);box-shadow:inset 0 1px 3px rgba(0,0,0,.1),0 1px 0 rgba(255,255,255,.7)}
+.search-box input:focus{outline:none;border-color:var(--acc);box-shadow:inset 0 1px 3px rgba(0,0,0,.1),0 0 0 2px rgba(26,82,118,.2)}
+.search-box::before{content:'🔍';position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:.75rem}
+.btn-h{background:linear-gradient(180deg,#fff,#e8eaef);border:1px solid var(--border);border-bottom-color:var(--border-dark);border-radius:var(--rad);padding:0 12px;height:var(--btn-h);cursor:pointer;font-size:.82rem;color:var(--txt2);transition:all var(--trans);display:flex;align-items:center;gap:5px;font-family:inherit;font-weight:500;box-shadow:0 2px 3px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.8);text-shadow:0 1px 0 rgba(255,255,255,.6)}
+.btn-h:hover{background:linear-gradient(180deg,#f0f4f8,#dce2ea);border-color:var(--acc);color:var(--acc)}
+.btn-h:active{box-shadow:var(--pressed);transform:translateY(1px)}
+.notif-dot{width:6px;height:6px;border-radius:50%;background:var(--danger);animation:pulse-badge 2s ease infinite;box-shadow:0 0 4px rgba(183,28,28,.5)}
+.cont{flex:1;padding:20px}
+.pant{display:none;animation:fadeUp 250ms ease}.pant.vis{display:block}
+.met-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.met{background:linear-gradient(180deg,#fafbfc,#ebeef2);border-radius:var(--rad);padding:16px 18px;border:1px solid var(--border);border-top-color:rgba(255,255,255,.8);border-bottom-color:var(--border-dark);box-shadow:var(--depth-card);transition:all var(--trans);position:relative;overflow:hidden;cursor:pointer}
+.met::before{content:'';position:absolute;top:0;left:0;bottom:0;width:5px}
+.met:hover{box-shadow:var(--depth-panel);transform:translateY(-2px)}
+.met:active{box-shadow:var(--pressed);transform:translateY(0)}
+.met.t::before{background:linear-gradient(180deg,#2980b9,#1a5276)}.met.g::before{background:linear-gradient(180deg,#2ecc71,#27783d)}.met.y::before{background:linear-gradient(180deg,#f39c12,#c17d10)}.met.r::before{background:linear-gradient(180deg,#e74c3c,#b71c1c)}
+.met.r{animation:pulse-red 2.5s ease infinite}
+.met-ic{font-size:1.3rem;margin-bottom:4px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.15))}
+.met-v{font-size:1.8rem;font-weight:700;line-height:1;margin-bottom:2px;text-shadow:0 1px 0 rgba(255,255,255,.6)}
+.met.t .met-v{color:var(--acc)}.met.g .met-v{color:var(--ok)}.met.y .met-v{color:var(--warn)}.met.r .met-v{color:var(--danger)}
+.met-l{font-size:.73rem;color:var(--txt2);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.dash{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.pan{background:linear-gradient(180deg,#fafbfc,#f0f2f5);border-radius:var(--rad);border:1px solid var(--border);border-top-color:rgba(255,255,255,.6);border-bottom-color:var(--border-dark);box-shadow:var(--depth-panel);overflow:hidden}
+.pan-h{padding:12px 18px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#e4e8ee,#d4d9e2);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 1px 2px rgba(0,0,0,.06);display:flex;align-items:center;justify-content:space-between}
+.pan-h h2{font-size:.82rem;font-weight:700;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.03em;color:var(--pri);text-shadow:0 1px 0 rgba(255,255,255,.7)}
+.pan-b{padding:0;max-height:380px;overflow-y:auto}
+.urg{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--border);transition:all var(--trans);cursor:pointer}
+.urg:last-child{border-bottom:none}.urg:hover{background:linear-gradient(180deg,rgba(26,82,118,.04),rgba(26,82,118,.08))}
+.urg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.3),inset 0 -1px 1px rgba(0,0,0,.2),inset 0 1px 1px rgba(255,255,255,.4)}
+.urg-dot.g{background:radial-gradient(circle at 35% 35%,#4caf50,#1b5e20)}.urg-dot.y{background:radial-gradient(circle at 35% 35%,#ffc107,#c17d10)}.urg-dot.o{background:radial-gradient(circle at 35% 35%,#ff9800,#954500)}.urg-dot.r{background:radial-gradient(circle at 35% 35%,#f44336,#8b1515);animation:pulse-red 2s ease infinite}
+.urg-info{flex:1;min-width:0}.urg-rad{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.urg-tipo{font-size:.73rem;color:var(--txt2)}
+.urg-v{font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:var(--rad);white-space:nowrap;text-transform:uppercase;letter-spacing:.02em;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 1px 2px rgba(0,0,0,.1);border:1px solid rgba(0,0,0,.08)}
+.urg-v.g{background:linear-gradient(180deg,#e8f5e9,#c8e6c9);color:#1b5e2a}.urg-v.y{background:linear-gradient(180deg,#fff8e1,#ffecb3);color:#8a5a08}.urg-v.o{background:linear-gradient(180deg,#fff3e0,#ffe0b2);color:#954500}.urg-v.r{background:linear-gradient(180deg,#ffebee,#ffcdd2);color:#8b1515}
+.cal{padding:12px 18px}.cal-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.cal-h h3{font-size:.85rem;font-weight:700;color:var(--pri);text-shadow:0 1px 0 rgba(255,255,255,.6)}
+.cal-nb{background:linear-gradient(180deg,#fff,#e8eaef);border:1px solid var(--border);border-bottom-color:var(--border-dark);border-radius:var(--rad);width:28px;height:28px;cursor:pointer;font-size:.78rem;display:flex;align-items:center;justify-content:center;color:var(--txt2);transition:all var(--trans);box-shadow:0 1px 2px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.8)}
+.cal-nb:hover{background:linear-gradient(180deg,#edf2f7,#dce2ea);color:var(--acc);border-color:var(--acc)}.cal-nb:active{box-shadow:var(--pressed);transform:translateY(1px)}
+.cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;text-align:center}.cal-dn{font-size:.62rem;font-weight:700;color:var(--txt2);padding:4px 0;text-transform:uppercase;letter-spacing:.05em}
+.cal-d{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.76rem;border-radius:var(--rad);cursor:pointer;transition:all var(--trans);position:relative;color:var(--txt);font-weight:500}
+.cal-d:hover{background:linear-gradient(180deg,rgba(26,82,118,.08),rgba(26,82,118,.04));box-shadow:inset 0 0 0 1px rgba(26,82,118,.15)}
+.cal-d.hoy{background:linear-gradient(180deg,#2980b9,#1a5276);color:#fff;font-weight:700;box-shadow:0 2px 6px rgba(26,82,118,.4),inset 0 1px 0 rgba(255,255,255,.2);text-shadow:0 1px 2px rgba(0,0,0,.3)}
+.cal-d.om{color:var(--txt2);opacity:.3}.cal-d.festivo{color:var(--danger);font-weight:700}
+.cal-dots{display:flex;gap:2px;position:absolute;bottom:2px}.cal-dot{width:4px;height:4px;border-radius:50%;box-shadow:0 0 2px rgba(0,0,0,.3)}
+.f-card{background:linear-gradient(180deg,#fafbfc,#eef0f4);border-radius:var(--rad);border:1px solid var(--border);border-top-color:rgba(255,255,255,.6);box-shadow:var(--depth-panel);padding:22px;max-width:780px}
+.f-card h2{font-size:.93rem;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:8px;color:var(--pri);text-transform:uppercase;letter-spacing:.03em;text-shadow:0 1px 0 rgba(255,255,255,.7)}
+.f-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.f-g{display:flex;flex-direction:column;gap:3px}.f-g.full{grid-column:1/-1}
+.f-g label{font-size:.72rem;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.04em}
+.fc{border:1px solid var(--border);border-top-color:var(--border-dark);border-radius:var(--rad);padding:0 12px;height:var(--btn-h);font-size:.85rem;font-family:inherit;color:var(--txt);transition:all var(--trans);width:100%;background:linear-gradient(180deg,#f8f9fb,#fff);box-shadow:inset 0 1px 3px rgba(0,0,0,.08),0 1px 0 rgba(255,255,255,.6)}
+.fc:focus{outline:none;border-color:var(--acc);box-shadow:inset 0 1px 3px rgba(0,0,0,.08),0 0 0 2px rgba(26,82,118,.18)}
+textarea.fc{resize:vertical;min-height:64px;height:auto;padding:8px 12px}select.fc{cursor:pointer}
+.f-venc{background:linear-gradient(180deg,#e4e8ee,#d8dde5);border-radius:var(--rad);padding:12px 16px;display:flex;align-items:center;gap:10px;grid-column:1/-1;border:1px solid var(--border);box-shadow:inset 0 1px 3px rgba(0,0,0,.06),0 1px 0 rgba(255,255,255,.5)}
+.f-venc .vf{font-size:.95rem;font-weight:700;color:var(--acc);text-shadow:0 1px 0 rgba(255,255,255,.5)}.f-venc .vl{font-size:.72rem;color:var(--txt2);font-weight:600;text-transform:uppercase}
+.f-act{grid-column:1/-1;display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
+.btn{padding:0 18px;height:var(--btn-h);border-radius:var(--rad);font-size:.82rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all var(--trans);display:inline-flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:.03em}
+.btn-p{background:linear-gradient(180deg,#2088b0,#155070);color:#fff;border:1px solid #12445e;border-top-color:#2a9ac4;box-shadow:0 2px 4px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.2);text-shadow:0 1px 2px rgba(0,0,0,.3)}.btn-p:hover{background:linear-gradient(180deg,#1d7da2,#134868);box-shadow:0 3px 8px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.2)}.btn-p:active{box-shadow:var(--pressed);transform:translateY(1px)}
+.btn-s{background:linear-gradient(180deg,#fff,#e8eaef);color:var(--txt2);border:1px solid var(--border);border-bottom-color:var(--border-dark);box-shadow:0 2px 3px rgba(0,0,0,.1),inset 0 1px 0 rgba(255,255,255,.8);text-shadow:0 1px 0 rgba(255,255,255,.6)}.btn-s:hover{background:linear-gradient(180deg,#f0f4f8,#dce2ea);color:var(--txt)}.btn-s:active{box-shadow:var(--pressed);transform:translateY(1px)}
+.btn-ok{background:linear-gradient(180deg,#2ecc71,#1e8449);color:#fff;border:1px solid #196f3d;border-top-color:#48d486;box-shadow:0 2px 4px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.2);text-shadow:0 1px 2px rgba(0,0,0,.3)}.btn-ok:hover{background:linear-gradient(180deg,#28b463,#1a7a3a)}.btn-ok:active{box-shadow:var(--pressed);transform:translateY(1px)}
+.btn-danger{background:linear-gradient(180deg,#e74c3c,#a31b1b);color:#fff;border:1px solid #8b1515;border-top-color:#f06858;box-shadow:0 2px 4px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.15);text-shadow:0 1px 2px rgba(0,0,0,.3)}.btn-danger:hover{background:linear-gradient(180deg,#d94334,#8b1515)}.btn-danger:active{box-shadow:var(--pressed);transform:translateY(1px)}
+.btn-sm{padding:0 10px;height:30px;font-size:.72rem}
+.tw{overflow-x:auto;margin-top:14px}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:.82rem;border:1px solid var(--border-dark);border-radius:var(--rad);overflow:hidden;box-shadow:var(--depth-panel)}
+.tbl th{background:linear-gradient(180deg,#1e3a5f,#12263e);padding:11px 12px;text-align:left;font-weight:600;color:#fff;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid #0a1525;border-right:1px solid rgba(255,255,255,.06);text-shadow:0 1px 2px rgba(0,0,0,.4);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}.tbl th:last-child{border-right:none}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);vertical-align:middle;background:linear-gradient(180deg,#fafbfc,#f4f5f8)}.tbl td:last-child{border-right:none}
+.tbl tr:nth-child(even) td{background:linear-gradient(180deg,#f0f2f5,#ebeef2)}.tbl tr:hover td{background:linear-gradient(180deg,#e8edf4,#dce3ec)}
+.tbl tr.rv td{background:linear-gradient(180deg,#fde8e8,#fad4d4)}.tbl tr.rv{animation:pulse-red 3s ease infinite}
+.st{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:var(--rad);font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.02em;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 1px 2px rgba(0,0,0,.1)}
+.st.pen{background:linear-gradient(180deg,#fff8e1,#ffecb3);color:#8a5a08;border:1px solid #dbb96c}.st.tra{background:linear-gradient(180deg,#e3eff9,#c5ddf0);color:#14507a;border:1px solid #8bb8d8}.st.cum{background:linear-gradient(180deg,#e8f5e9,#c8e6c9);color:#1b5e2a;border:1px solid #7abf8c}.st.ven{background:linear-gradient(180deg,#ffebee,#ffcdd2);color:#8b1515;border:1px solid #d9a0a0}
+.nl{list-style:none}.ni{display:flex;gap:10px;padding:12px 18px;border-bottom:1px solid var(--border);transition:all var(--trans)}.ni:hover{background:linear-gradient(180deg,rgba(26,82,118,.03),rgba(26,82,118,.07))}.ni.unr{background:linear-gradient(90deg,rgba(26,82,118,.06),transparent);border-left:3px solid var(--acc)}
+.ni-ic{font-size:1.3rem;flex-shrink:0;margin-top:2px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.15))}.ni-c{flex:1}.ni-t{font-size:.84rem;font-weight:600;margin-bottom:2px}.ni-d{font-size:.76rem;color:var(--txt2)}.ni-a{display:flex;flex-direction:column;align-items:flex-end;gap:4px}.ni-time{font-size:.68rem;color:var(--txt2);white-space:nowrap}
+.btn-at{font-size:.7rem;padding:0 10px;height:28px;border-radius:var(--rad);background:linear-gradient(180deg,#2ecc71,#1e8449);color:#fff;border:1px solid #196f3d;border-top-color:#48d486;cursor:pointer;font-weight:600;transition:all var(--trans);font-family:inherit;text-transform:uppercase;letter-spacing:.02em;box-shadow:0 1px 3px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.15);text-shadow:0 1px 1px rgba(0,0,0,.2)}.btn-at:hover{background:linear-gradient(180deg,#28b463,#1a7a3a)}.btn-at:active{box-shadow:var(--pressed);transform:translateY(1px)}
+.cfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:840px}
+.cfg{background:linear-gradient(180deg,#fafbfc,#eef0f4);border-radius:var(--rad);border:1px solid var(--border);border-top-color:rgba(255,255,255,.6);box-shadow:var(--depth-card);padding:20px}
+.cfg h3{font-size:.83rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.03em;color:var(--pri);text-shadow:0 1px 0 rgba(255,255,255,.6)}
+.cfg-o{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}.cfg-o:last-child{border-bottom:none}.cfg-o label{font-size:.84rem;font-weight:500}.cfg-o small{font-size:.72rem;color:var(--txt2);display:block;margin-top:1px}
+.tog{width:42px;height:22px;border-radius:11px;position:relative;cursor:pointer;transition:all var(--trans);flex-shrink:0;background:linear-gradient(180deg,#b0b9c6,#98a5b4);border:1px solid var(--border-dark);box-shadow:inset 0 2px 4px rgba(0,0,0,.2),0 1px 0 rgba(255,255,255,.5)}.tog.on{background:linear-gradient(180deg,#2088b0,#155070);border-color:#12445e}
+.tog::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;top:2px;left:2px;transition:transform var(--trans);background:linear-gradient(180deg,#fff,#e8eaef);box-shadow:0 2px 4px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.8)}.tog.on::after{transform:translateX(20px)}
+.flts{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.flt{padding:0 12px;height:30px;display:inline-flex;align-items:center;border-radius:var(--rad);font-size:.72rem;font-weight:600;cursor:pointer;transition:all var(--trans);text-transform:uppercase;letter-spacing:.03em;background:linear-gradient(180deg,#fff,#e8eaef);border:1px solid var(--border);border-bottom-color:var(--border-dark);color:var(--txt2);box-shadow:0 1px 2px rgba(0,0,0,.1),inset 0 1px 0 rgba(255,255,255,.7);text-shadow:0 1px 0 rgba(255,255,255,.5)}
+.flt:hover{background:linear-gradient(180deg,#edf2f7,#dce2ea);border-color:var(--acc);color:var(--acc)}
+.flt.on{background:linear-gradient(180deg,#2088b0,#155070);color:#fff;border-color:#12445e;border-top-color:#2a9ac4;box-shadow:0 2px 4px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.15);text-shadow:0 1px 2px rgba(0,0,0,.3)}.flt:active{box-shadow:var(--pressed);transform:translateY(1px)}
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99}.ov.vis{display:block}
+.estado-vacio{text-align:center;padding:40px 20px;color:var(--txt2)}.estado-vacio .ic-g{font-size:2.2rem;margin-bottom:10px;opacity:.35}.estado-vacio p{font-size:.88rem;max-width:280px;margin:0 auto}
+.link-exp{display:inline-flex;align-items:center;gap:3px;color:var(--acc);font-size:.76rem;text-decoration:none;font-weight:600}.link-exp:hover{text-decoration:underline}
+.toast{position:fixed;bottom:20px;right:20px;background:linear-gradient(180deg,#1e3a5f,#12263e);color:#fff;padding:12px 20px;border-radius:var(--rad);font-size:.84rem;font-weight:500;z-index:200;transform:translateY(100px);opacity:0;transition:all .3s ease;display:flex;align-items:center;gap:7px;border:1px solid rgba(255,255,255,.1);box-shadow:0 6px 20px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.08);text-shadow:0 1px 2px rgba(0,0,0,.4)}.toast.vis{transform:translateY(0);opacity:1}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:150;align-items:center;justify-content:center}.modal-bg.vis{display:flex}
+.modal{background:linear-gradient(180deg,#fafbfc,#eef0f4);border-radius:var(--rad);padding:24px;max-width:420px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,.4),var(--depth-panel);border:1px solid var(--border);border-top-color:rgba(255,255,255,.6)}
+.modal h3{font-size:.93rem;font-weight:700;margin-bottom:12px;color:var(--pri);text-transform:uppercase;text-shadow:0 1px 0 rgba(255,255,255,.6)}.modal p{font-size:.85rem;color:var(--txt2);margin-bottom:18px}.modal-acts{display:flex;gap:8px;justify-content:flex-end}
+
+/* ── FIREBASE / AUTENTICACIÓN / SINCRONIZACIÓN ── */
+.firebase-status{display:flex;align-items:center;gap:6px}
+.firebase-status .sync-led{width:8px;height:8px;border-radius:50%;background:#7f8c8d;box-shadow:0 1px 3px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.35)}
+.firebase-status.online .sync-led{background:#2e7d32}.firebase-status.pending .sync-led{background:#f39c12;animation:pulse-badge 1.5s ease infinite}.firebase-status.offline .sync-led{background:#c17d10}.firebase-status.error .sync-led{background:#b71c1c}
+.firebase-resumen{font-size:.77rem;color:var(--txt2);line-height:1.45}.firebase-resumen strong{color:var(--txt)}
+.firebase-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.auth-gate{display:none;position:fixed;inset:0;z-index:1200;background:rgba(8,18,32,.86);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:18px}.auth-gate.vis{display:flex}
+.auth-card{width:min(440px,100%);background:linear-gradient(180deg,#fafbfc,#e8ebf0);color:#1c2331;border:1px solid #9ba7b6;border-radius:7px;box-shadow:0 18px 55px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.85);padding:24px;text-align:center}
+.auth-card .auth-esc{font-size:2.6rem;margin-bottom:6px}.auth-card h2{font-size:1.05rem;color:#162544;margin-bottom:8px}.auth-card p{font-size:.8rem;color:#546178;margin-bottom:14px}.auth-card .auth-msg{padding:9px 11px;background:#eef2f7;border:1px solid #c3cbd5;border-radius:5px;font-size:.76rem;color:#3f4c60;text-align:left;margin-bottom:14px;word-break:break-word}
+.fb-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.fb-grid .full{grid-column:1/-1}.fb-help{font-size:.72rem;color:var(--txt2);line-height:1.45;margin:0 0 12px}.fb-help code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.7rem}
+@media(max-width:768px){#fb-status-text{display:none}.fb-grid{grid-template-columns:1fr}}
+
+@media(max-width:1100px){.met-grid{grid-template-columns:repeat(2,1fr)}.dash{grid-template-columns:1fr}.cfg-grid{grid-template-columns:1fr}}
+@media(max-width:768px){.side{transform:translateX(-100%)}.side.open{transform:translateX(0)}.main{margin-left:0}.btn-ham{display:flex}.cont{padding:14px 10px}.met-grid{grid-template-columns:1fr 1fr;gap:8px}.met{padding:12px}.met-v{font-size:1.4rem}.f-grid{grid-template-columns:1fr}.head{padding:0 10px}.search-box input{width:150px}}
+@media(max-width:480px){.met{padding:10px}.met-v{font-size:1.2rem}.search-box{display:none}}
+@media print{.side,.head,.btn,.btn-h{display:none!important}.main{margin-left:0}.cont{padding:0}.pan{box-shadow:none;border:1px solid #999}}
+</style>
 </head>
 <body>
+<div class="ov" id="ov" onclick="cm()"></div>
+<aside class="side" id="side">
+<div class="side-head"><div class="esc">⚖️</div><div class="side-desp">República de Colombia<br>Rama Judicial del Poder Público<br>Juzgado Catorce Penal Municipal<br>con Función de Conocimiento<br>Ibagué — Tolima</div></div>
+<div class="side-brand"><h1>SIGAJ</h1><small>Agenda Judicial Inteligente</small></div>
+<nav class="side-nav">
+<button class="nav-btn on" onclick="nav('dash',this)"><span class="ic">📊</span>Dashboard<span class="badge-n" id="bv" style="display:none">0</span></button>
+<button class="nav-btn" onclick="nav('ev',this)"><span class="ic">📋</span>Eventos</button>
+<button class="nav-btn" onclick="nav('new',this)"><span class="ic">➕</span>Nuevo Evento</button>
+<button class="nav-btn" onclick="nav('notif',this)"><span class="ic">🔔</span>Notificaciones<span class="badge-n" id="bn" style="display:none">0</span></button>
+<button class="nav-btn" onclick="nav('cfg',this)"><span class="ic">⚙️</span>Configuración</button>
+</nav>
+<div class="side-foot">SIGAJ v3.0 · 2026</div>
+</aside>
+<div class="main">
+<header class="head">
+<button class="btn-ham" onclick="om()">☰</button>
+<span class="head-t" id="ht">📊 Dashboard</span>
+<div class="head-act">
+<div class="search-box"><input type="text" placeholder="Buscar radicado..." id="busq" oninput="buscar()"></div>
+<button class="btn-h firebase-status" id="fb-status-btn" onclick="abrirConfigFirebase()" title="Estado de sincronización"><span class="sync-led"></span><span id="fb-status-icon">💻</span><span id="fb-status-text">Local</span></button>
+<button class="btn-h" onclick="nav('notif')">🔔<span class="notif-dot" id="nd" style="display:none"></span></button>
+<button class="btn-h" onclick="nav('new')">➕ Nuevo</button>
+</div>
+</header>
+<div class="cont">
 
-  <!-- OVERLAY MÓVIL -->
-  <div class="sidebar-overlay" id="overlay" onclick="cerrarMenu()"></div>
+<!-- DASHBOARD -->
+<section class="pant vis" id="p-dash">
+<div class="met-grid">
+<div class="met t" onclick="nav('ev')"><div class="met-ic">📁</div><div class="met-v" id="m-total">0</div><div class="met-l">Eventos activos</div></div>
+<div class="met g" onclick="filtrarEstado('ok')"><div class="met-ic">✅</div><div class="met-v" id="m-ok">0</div><div class="met-l">Al día</div></div>
+<div class="met y" onclick="filtrarEstado('prox')"><div class="met-ic">⏰</div><div class="met-v" id="m-prox">0</div><div class="met-l">Próximos a vencer</div></div>
+<div class="met r" id="met-venc" onclick="filtrarEstado('venc')"><div class="met-ic">🔴</div><div class="met-v" id="m-venc">0</div><div class="met-l">VENCIDOS</div></div>
+</div>
+<div class="dash">
+<div class="pan"><div class="pan-h"><h2>🚨 Eventos urgentes</h2><span style="font-size:.76rem;color:var(--txt2)">Top 10</span></div><div class="pan-b" id="lista-urg"></div></div>
+<div class="pan"><div class="pan-h"><h2>🗓️ Calendario</h2></div><div class="cal"><div class="cal-h"><button class="cal-nb" onclick="moverMes(-1)">◀</button><h3 id="cal-titulo"></h3><button class="cal-nb" onclick="moverMes(1)">▶</button></div><div class="cal-g" id="cal-grid"></div></div></div>
+</div>
+</section>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-escudo"><span>⚖️</span></div>
-      <div class="sidebar-despacho">
-        República de Colombia<br>
-        Rama Judicial del Poder Público<br>
-        Juzgado Catorce Penal Municipal<br>
-        con Función de Conocimiento<br>
-        Ibagué — Tolima
-      </div>
-    </div>
+<!-- EVENTOS -->
+<section class="pant" id="p-ev">
+<div class="flts" id="filtros-ev">
+<span class="flt on" data-f="todos" onclick="setFiltro(this)">Todos</span>
+<span class="flt" data-f="vencido" onclick="setFiltro(this)">🔴 Vencidos</span>
+<span class="flt" data-f="proximo" onclick="setFiltro(this)">🟡 Próximos</span>
+<span class="flt" data-f="ok" onclick="setFiltro(this)">🟢 Al día</span>
+<span class="flt" data-f="cumplido" onclick="setFiltro(this)">✅ Cumplidos</span>
+<select class="fc" style="max-width:210px;font-size:.8rem;padding:6px 10px" id="filtro-tipo" onchange="renderTabla()">
+<option value="">Todas las actuaciones</option>
+</select>
+</div>
+<div class="pan"><div class="tw"><table class="tbl"><thead><tr><th>Radicado</th><th>Tipo</th><th>Inicio</th><th>Vence</th><th>Días</th><th>Estado</th><th>Resp.</th><th></th></tr></thead><tbody id="tbody-ev"></tbody></table></div></div>
+</section>
 
-    <div class="sidebar-brand">
-      <h1>SIGAJ</h1>
-      <small>Agenda Judicial Inteligente</small>
-    </div>
+<!-- NUEVO/EDITAR EVENTO -->
+<section class="pant" id="p-new">
+<div class="f-card">
+<h2 id="form-titulo">➕ Registrar nuevo evento</h2>
+<div class="f-grid">
+<input type="hidden" id="ev-id">
+<div class="f-g"><label>Radicado *</label><input class="fc" id="ev-rad" placeholder="Ej: 2026-00215"></div>
+<div class="f-g"><label>Tipo de actuación *</label><select class="fc" id="ev-tipo" onchange="onTipoChange()"></select></div>
+<div class="f-g"><label id="ev-fecha-label">Fecha inicio del término *</label><input type="date" class="fc" id="ev-fecha" onchange="calcVenc()"></div>
+<div class="f-g"><label>Plazo (días hábiles) *</label><input type="number" class="fc" id="ev-plazo" placeholder="Auto" min="1" onchange="calcVenc()"></div>
+<div class="f-g"><label>Responsable</label><input class="fc" id="ev-resp" placeholder="Sustanciador, Secretaria, Juez"></div>
+<div class="f-g"><label>Prioridad</label><select class="fc" id="ev-prio"><option value="normal">Normal</option><option value="alta">Alta</option><option value="urgente">Urgente</option></select></div>
+<div class="f-g full"><label>Descripción</label><textarea class="fc" id="ev-desc" placeholder="Descripción del evento..."></textarea></div>
+<div class="f-g full"><label>🔗 Enlace al expediente / carpeta</label><input class="fc" id="ev-link" placeholder="https://onedrive.com/... o URL del expediente digital"></div>
+<div class="f-g full"><label>Notas</label><textarea class="fc" id="ev-notas" placeholder="Observaciones adicionales..." style="min-height:50px"></textarea></div>
+<div class="f-venc"><span style="font-size:1.4rem">📅</span><div><div class="vl">Fecha de vencimiento calculada</div><div class="vf" id="ev-venc-txt">Seleccione fecha y plazo</div></div></div>
+<div class="f-g full" id="ev-bif-info" style="display:none;background:var(--warn-s);border:1px solid #dbb96c;border-radius:var(--rad);padding:12px 16px;font-size:.78rem;color:#8a5a08">
+  ⚖️ <strong>Flujo de ejecutoria (Ley 906/2004):</strong> este primer plazo de 5 días es el traslado a
+  sujetos recurrentes. Al vencer, SIGAJ le preguntará si se interpuso recurso — si es así, abrirá
+  automáticamente un segundo plazo de 5 días de traslado a los no recurrentes; si no, generará la
+  constancia de ejecutoria.
+</div>
+<div class="f-act"><button class="btn btn-s" onclick="limpiarForm()">Cancelar</button><button class="btn btn-p" onclick="guardarEvento()">💾 Guardar evento</button></div>
+</div>
+</div>
+</section>
 
-    <nav class="sidebar-nav">
-      <button class="sidebar-nav-item activo" onclick="navegar('dashboard', this)">
-        <span class="icono">📊</span> Dashboard
-        <span class="badge-nav" id="badge-vencidos">3</span>
-      </button>
-      <button class="sidebar-nav-item" onclick="navegar('eventos', this)">
-        <span class="icono">📋</span> Gestión de Eventos
-      </button>
-      <button class="sidebar-nav-item" onclick="navegar('nuevo', this)">
-        <span class="icono">➕</span> Nuevo Evento
-      </button>
-      <button class="sidebar-nav-item" onclick="navegar('notificaciones', this)">
-        <span class="icono">🔔</span> Notificaciones
-        <span class="badge-nav">5</span>
-      </button>
-      <button class="sidebar-nav-item" onclick="navegar('config', this)">
-        <span class="icono">⚙️</span> Configuración
-      </button>
-    </nav>
+<!-- NOTIFICACIONES -->
+<section class="pant" id="p-notif">
+<div class="flts" style="margin-bottom:12px">
+<span class="flt on" data-f="todas" onclick="setFiltroNotif(this)">Todas</span>
+<span class="flt" data-f="no-leidas" onclick="setFiltroNotif(this)">No leídas</span>
+<button class="btn btn-s" style="margin-left:auto;font-size:.78rem;padding:5px 12px" onclick="marcarTodasLeidas()">Marcar todas leídas</button>
+</div>
+<div class="pan"><ul class="nl pan-b" style="max-height:none" id="lista-notif"></ul></div>
+</section>
 
-    <div class="sidebar-footer">
-      SIGAJ v1.0 · 2026
-    </div>
-  </aside>
+<!-- CONFIGURACIÓN -->
+<section class="pant" id="p-cfg">
+<div class="cfg-grid">
+<div class="cfg"><h3>🔔 Alertas</h3>
+<div class="cfg-o"><div><label>Sonido de alerta</label><small>Para eventos vencidos</small></div><button class="tog on" id="cfg-sonido" onclick="this.classList.toggle('on');guardarConfig()"></button></div>
+<div class="cfg-o"><div><label>Notificaciones push</label><small>Recibir alertas del navegador</small></div><button class="tog on" id="cfg-push" onclick="togglePush(this)"></button></div>
+<div class="cfg-o"><div><label>Días de anticipación</label><small>Días antes del vencimiento</small></div><input type="number" class="fc" id="cfg-dias" value="2" min="1" max="10" style="width:65px;text-align:center;padding:5px" onchange="guardarConfig();renderAll()"></div>
+</div>
+<div class="cfg"><h3>🎨 Apariencia</h3>
+<div class="cfg-o"><div><label>Tema oscuro</label><small>Cambiar tema visual</small></div><button class="tog" id="cfg-tema" onclick="toggleTema(this)"></button></div>
+</div>
+<div class="cfg"><h3>📅 Festivos 2026</h3>
+<div id="lista-festivos" style="font-size:.8rem;color:var(--txt2);max-height:200px;overflow-y:auto"></div>
+</div>
+<div class="cfg"><h3>💾 Datos</h3>
+<div class="cfg-o"><div><label>Exportar datos</label><small>Descargar JSON</small></div><button class="btn btn-p btn-sm" onclick="exportar()">📤 Exportar</button></div>
+<div class="cfg-o"><div><label>Importar datos</label><small>Restaurar desde JSON</small></div><button class="btn btn-s btn-sm" onclick="document.getElementById('imp-file').click()">📥 Importar</button><input type="file" id="imp-file" accept=".json" style="display:none" onchange="importar(event)"></div>
+<div class="cfg-o"><div><label>Reporte imprimible</label><small>Generar para imprimir</small></div><button class="btn btn-s btn-sm" onclick="window.print()">🖨️ Imprimir</button></div>
+</div>
+<div class="cfg" style="grid-column:1/-1"><h3>☁️ Sincronización entre dispositivos</h3>
+<div class="firebase-resumen" id="fb-resumen"><strong>Modo local.</strong> Los datos permanecen únicamente en este dispositivo hasta configurar Firebase.</div>
+<div class="firebase-actions">
+<button class="btn btn-p btn-sm" onclick="abrirConfigFirebase()">⚙️ Configurar Firebase</button>
+<button class="btn btn-s btn-sm" id="fb-login-btn" onclick="iniciarSesionFirebase()" style="display:none">🔐 Iniciar sesión con Google</button>
+<button class="btn btn-s btn-sm" id="fb-logout-btn" onclick="cerrarSesionFirebase()" style="display:none">🚪 Cerrar sesión</button>
+<button class="btn btn-s btn-sm" id="fb-rules-btn" onclick="copiarReglasFirestore()" style="display:none">📋 Copiar reglas Firestore</button>
+</div>
+</div>
+</div>
+</section>
 
-  <!-- CONTENIDO PRINCIPAL -->
-  <div class="main">
+</div></div>
 
-    <!-- HEADER -->
-    <header class="header">
-      <button class="btn-menu-movil" onclick="abrirMenu()">☰</button>
-      <span class="header-titulo" id="header-titulo">📊 Dashboard</span>
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+<!-- MODAL CONFIRMAR -->
+<div class="modal-bg" id="modal"><div class="modal"><h3 id="modal-t"></h3><p id="modal-p"></p><div class="modal-acts"><button class="btn btn-s" onclick="cerrarModal()">Cancelar</button><button class="btn btn-danger" id="modal-btn" onclick="">Eliminar</button></div></div></div>
 
-      <div class="header-acciones">
-        <div class="barra-busqueda">
-          <input type="text" placeholder="Buscar por radicado, tipo..." id="busqueda-global">
-        </div>
-        <button class="btn-header" onclick="navegar('notificaciones', document.querySelector('[data-pant=notificaciones]'))">
-          🔔 <span class="notif-dot"></span>
-        </button>
-        <button class="btn-header" onclick="navegar('nuevo', document.querySelector('[data-pant=nuevo]'))">
-          ➕ Nuevo
-        </button>
-      </div>
-    </header>
-
-    <div class="contenido">
-
-      <!-- ═══════ PANTALLA: DASHBOARD ═══════ -->
-      <section class="pantalla visible" id="pant-dashboard">
-
-        <!-- Métricas -->
-        <div class="metricas-grid">
-          <div class="metrica-card total">
-            <div class="metrica-icono">📁</div>
-            <div class="metrica-valor">24</div>
-            <div class="metrica-label">Eventos activos</div>
-          </div>
-          <div class="metrica-card ok">
-            <div class="metrica-icono">✅</div>
-            <div class="metrica-valor">15</div>
-            <div class="metrica-label">Al día</div>
-          </div>
-          <div class="metrica-card proximo">
-            <div class="metrica-icono">⏰</div>
-            <div class="metrica-valor">6</div>
-            <div class="metrica-label">Próximos a vencer</div>
-          </div>
-          <div class="metrica-card vencido">
-            <div class="metrica-icono">🔴</div>
-            <div class="metrica-valor">3</div>
-            <div class="metrica-label">VENCIDOS</div>
-          </div>
-        </div>
-
-        <!-- Grilla principal -->
-        <div class="dash-grid">
-
-          <!-- Urgencias -->
-          <div class="panel">
-            <div class="panel-header">
-              <h2>🚨 Eventos urgentes</h2>
-              <span style="font-size:0.78rem; color:var(--texto-secundario)">Top 10</span>
-            </div>
-            <div class="panel-body">
-              <div class="urgencia-item">
-                <div class="urgencia-estado rojo"></div>
-                <div class="urgencia-info">
-                  <div class="urgencia-radicado">2026-00142</div>
-                  <div class="urgencia-tipo">🛡️ Tutela — Fallo Primera Instancia</div>
-                </div>
-                <span class="urgencia-vence rojo">Vencido hace 2 días</span>
-              </div>
-              <div class="urgencia-item">
-                <div class="urgencia-estado rojo"></div>
-                <div class="urgencia-info">
-                  <div class="urgencia-radicado">2026-00189</div>
-                  <div class="urgencia-tipo">📩 Derecho de Petición</div>
-                </div>
-                <span class="urgencia-vence rojo">Vencido hace 1 día</span>
-              </div>
-              <div class="urgencia-item">
-                <div class="urgencia-estado rojo"></div>
-                <div class="urgencia-info">
-                  <div class="urgencia-radicado">2026-00201</div>
-                  <div class="urgencia-tipo">🔍 Vigilancia Judicial</div>
-                </div>
-                <span class="urgencia-vence rojo">Vence hoy</span>
-              </div>
-              <div class="urgencia-item">
-                <div class="urgencia-estado naranja"></div>
-                <div class="urgencia-info">
-                  <div class="urgencia-radicado">2026-00198</div>
-                  <div class="urgencia-tipo">⚖️ Recurso de Apelación</div>
-                </div>
-                <span class="urgencia-vence naranja">Vence mañana</span>
-              </div>
-              <div class="urgencia-item">
-                <div class="urgencia-estado amarillo"></div>
-                <div class="urgencia-info">
-                  <div class="urgencia-radicado">2026-00195</div>
-                  <div class="urgencia-tipo">⚠️ Incidente de Desacato</div>
-                </div>
-                <span class="urgencia-vence amarillo">Vence en 2 días</span>
-              </div>
-              <div class="urgencia-item">
-                <div class="urgencia-estado amarillo"></div>
-                <div class="urgencia-info">
-                  <div class="urgencia-radicado">2026-00210</div>
-                  <div class="urgencia-tipo">🛡️ Tutela en contra del Juzgado</div>
-                </div>
-                <span class="urgencia-vence amarillo">Vence en 2 días</span>
-              </div>
-              <div class="urgencia-item">
-                <div class="urgencia-estado verde"></div>
-                <div class="urgencia-info">
-                  <div class="urgencia-radicado">2026-00175</div>
-                  <div class="urgencia-tipo">📜 Ejecutoria de Sentencia Penal</div>
-                </div>
-                <span class="urgencia-vence verde">Vence en 4 días</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Calendario -->
-          <div class="panel">
-            <div class="panel-header">
-              <h2>🗓️ Calendario</h2>
-            </div>
-            <div class="calendario">
-              <div class="cal-header">
-                <button class="cal-nav-btn">◀</button>
-                <h3>Septiembre 2026</h3>
-                <button class="cal-nav-btn">▶</button>
-              </div>
-              <div class="cal-grid">
-                <div class="cal-dia-nombre">Lu</div>
-                <div class="cal-dia-nombre">Ma</div>
-                <div class="cal-dia-nombre">Mi</div>
-                <div class="cal-dia-nombre">Ju</div>
-                <div class="cal-dia-nombre">Vi</div>
-                <div class="cal-dia-nombre">Sa</div>
-                <div class="cal-dia-nombre">Do</div>
-
-                <div class="cal-dia otro-mes">31</div>
-                <div class="cal-dia">1</div>
-                <div class="cal-dia">2</div>
-                <div class="cal-dia">3</div>
-                <div class="cal-dia">4</div>
-                <div class="cal-dia">5</div>
-                <div class="cal-dia">6</div>
-
-                <div class="cal-dia">7</div>
-                <div class="cal-dia">8<div class="cal-dots"><span class="cal-dot" style="background:var(--peligro)"></span></div></div>
-                <div class="cal-dia">9</div>
-                <div class="cal-dia">10<div class="cal-dots"><span class="cal-dot" style="background:var(--advertencia)"></span></div></div>
-                <div class="cal-dia">11<div class="cal-dots"><span class="cal-dot" style="background:var(--peligro)"></span><span class="cal-dot" style="background:var(--advertencia)"></span></div></div>
-                <div class="cal-dia">12</div>
-                <div class="cal-dia hoy">13</div>
-
-                <div class="cal-dia">14<div class="cal-dots"><span class="cal-dot" style="background:var(--naranja)"></span></div></div>
-                <div class="cal-dia">15<div class="cal-dots"><span class="cal-dot" style="background:var(--advertencia)"></span></div></div>
-                <div class="cal-dia">16</div>
-                <div class="cal-dia">17<div class="cal-dots"><span class="cal-dot" style="background:var(--exito)"></span></div></div>
-                <div class="cal-dia">18</div>
-                <div class="cal-dia">19</div>
-                <div class="cal-dia">20</div>
-
-                <div class="cal-dia">21</div>
-                <div class="cal-dia">22<div class="cal-dots"><span class="cal-dot" style="background:var(--exito)"></span></div></div>
-                <div class="cal-dia">23</div>
-                <div class="cal-dia">24</div>
-                <div class="cal-dia">25<div class="cal-dots"><span class="cal-dot" style="background:var(--exito)"></span><span class="cal-dot" style="background:var(--exito)"></span></div></div>
-                <div class="cal-dia">26</div>
-                <div class="cal-dia">27</div>
-
-                <div class="cal-dia">28</div>
-                <div class="cal-dia">29</div>
-                <div class="cal-dia">30</div>
-                <div class="cal-dia otro-mes">1</div>
-                <div class="cal-dia otro-mes">2</div>
-                <div class="cal-dia otro-mes">3</div>
-                <div class="cal-dia otro-mes">4</div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- ═══════ PANTALLA: GESTIÓN DE EVENTOS ═══════ -->
-      <section class="pantalla" id="pant-eventos">
-        <div class="filtros-bar">
-          <span class="filtro-chip activo">Todos</span>
-          <span class="filtro-chip">🔴 Vencidos</span>
-          <span class="filtro-chip">🟡 Próximos</span>
-          <span class="filtro-chip">🟢 Al día</span>
-          <span class="filtro-chip">✅ Cumplidos</span>
-          <select class="form-control" style="max-width:220px;font-size:0.82rem;padding:7px 12px;">
-            <option value="">Todas las actuaciones</option>
-            <option>🛡️ Tutela — Fallo Primera Instancia</option>
-            <option>🛡️ Tutela en contra del Juzgado</option>
-            <option>🛡️ Tutela — Impugnación</option>
-            <option>📩 Derecho de Petición</option>
-            <option>⚖️ Recurso de Reposición</option>
-            <option>⚖️ Recurso de Apelación</option>
-            <option>📜 Ejecutoria de Sentencia Penal</option>
-            <option>💰 Incidente de Reparación Integral</option>
-            <option>🔍 Vigilancia Judicial</option>
-            <option>⚠️ Incidente de Desacato</option>
-            <option>🔒 Medida Cautelar</option>
-            <option>📤 Comisión / Despacho Comisorio</option>
-            <option>🏛️ Requerimiento de Ente de Control</option>
-            <option>📝 Solicitud General</option>
-          </select>
-        </div>
-
-        <div class="panel">
-          <div class="tabla-wrapper">
-            <table class="tabla-eventos">
-              <thead>
-                <tr>
-                  <th>Radicado</th>
-                  <th>Tipo</th>
-                  <th>Inicio</th>
-                  <th>Vence</th>
-                  <th>Días</th>
-                  <th>Estado</th>
-                  <th>Responsable</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="fila-vencida">
-                  <td><strong>2026-00142</strong></td>
-                  <td>🛡️ Tutela — Fallo 1ª Inst.</td>
-                  <td>28/ago/2026</td>
-                  <td>11/sep/2026</td>
-                  <td style="color:var(--peligro);font-weight:700">-2</td>
-                  <td><span class="estado-badge vencido">🔴 Vencido</span></td>
-                  <td>Sustanciador</td>
-                  <td><button class="btn btn-exito" style="padding:6px 12px;font-size:0.78rem">✅ Atender</button></td>
-                </tr>
-                <tr class="fila-vencida">
-                  <td><strong>2026-00189</strong></td>
-                  <td>📩 Derecho de Petición</td>
-                  <td>20/ago/2026</td>
-                  <td>12/sep/2026</td>
-                  <td style="color:var(--peligro);font-weight:700">-1</td>
-                  <td><span class="estado-badge vencido">🔴 Vencido</span></td>
-                  <td>Secretaria</td>
-                  <td><button class="btn btn-exito" style="padding:6px 12px;font-size:0.78rem">✅ Atender</button></td>
-                </tr>
-                <tr>
-                  <td><strong>2026-00198</strong></td>
-                  <td>⚖️ Recurso de Apelación</td>
-                  <td>10/sep/2026</td>
-                  <td>15/sep/2026</td>
-                  <td style="color:var(--naranja);font-weight:600">1</td>
-                  <td><span class="estado-badge pendiente">⏰ Pendiente</span></td>
-                  <td>Sustanciador</td>
-                  <td><button class="btn btn-secundario" style="padding:6px 12px;font-size:0.78rem">✏️ Editar</button></td>
-                </tr>
-                <tr>
-                  <td><strong>2026-00195</strong></td>
-                  <td>⚠️ Incidente de Desacato</td>
-                  <td>09/sep/2026</td>
-                  <td>16/sep/2026</td>
-                  <td style="color:var(--advertencia);font-weight:600">2</td>
-                  <td><span class="estado-badge pendiente">⏰ Pendiente</span></td>
-                  <td>Juez</td>
-                  <td><button class="btn btn-secundario" style="padding:6px 12px;font-size:0.78rem">✏️ Editar</button></td>
-                </tr>
-                <tr>
-                  <td><strong>2026-00175</strong></td>
-                  <td>📜 Ejecutoria Sent. Penal</td>
-                  <td>08/sep/2026</td>
-                  <td>18/sep/2026</td>
-                  <td style="color:var(--exito)">4</td>
-                  <td><span class="estado-badge en_tramite">📂 En trámite</span></td>
-                  <td>Secretaria</td>
-                  <td><button class="btn btn-secundario" style="padding:6px 12px;font-size:0.78rem">✏️ Editar</button></td>
-                </tr>
-                <tr>
-                  <td><strong>2026-00160</strong></td>
-                  <td>🛡️ Tutela en contra</td>
-                  <td>01/sep/2026</td>
-                  <td>03/sep/2026</td>
-                  <td style="color:var(--exito)">—</td>
-                  <td><span class="estado-badge cumplido">✅ Cumplido</span></td>
-                  <td>Juez</td>
-                  <td><button class="btn btn-secundario" style="padding:6px 12px;font-size:0.78rem">👁️ Ver</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ═══════ PANTALLA: NUEVO EVENTO ═══════ -->
-      <section class="pantalla" id="pant-nuevo">
-        <div class="form-card">
-          <h2>➕ Registrar nuevo evento</h2>
-          <div class="form-grid">
-            <div class="form-grupo">
-              <label>Radicado *</label>
-              <input type="text" class="form-control" placeholder="Ej: 2026-00215">
-            </div>
-            <div class="form-grupo">
-              <label>Tipo de actuación *</label>
-              <select class="form-control">
-                <option value="">— Seleccionar —</option>
-                <option>🛡️ Tutela — Fallo Primera Instancia (10 días)</option>
-                <option>🛡️ Tutela en contra del Juzgado (2 días)</option>
-                <option>🛡️ Tutela — Impugnación (2 días)</option>
-                <option>📩 Derecho de Petición (15 días)</option>
-                <option>📩 Derecho de Petición — Información (10 días)</option>
-                <option>⚖️ Recurso de Reposición (3 días)</option>
-                <option>⚖️ Recurso de Apelación (3 días)</option>
-                <option>📜 Ejecutoria de Sentencia Penal (5 días)</option>
-                <option>💰 Incidente de Reparación Integral (30 días)</option>
-                <option>🔍 Vigilancia Judicial (5 días)</option>
-                <option>⚠️ Incidente de Desacato (3 días)</option>
-                <option>🔒 Medida Cautelar (1 día)</option>
-                <option>📤 Comisión / Despacho Comisorio (10 días)</option>
-                <option>🏛️ Requerimiento de Ente de Control (5 días)</option>
-                <option>📝 Solicitud General (15 días)</option>
-                <option>📌 Otro (10 días)</option>
-              </select>
-            </div>
-            <div class="form-grupo">
-              <label>Fecha de inicio del término *</label>
-              <input type="date" class="form-control">
-            </div>
-            <div class="form-grupo">
-              <label>Plazo (días hábiles) *</label>
-              <input type="number" class="form-control" placeholder="Auto-poblado" min="1">
-            </div>
-            <div class="form-grupo">
-              <label>Responsable</label>
-              <input type="text" class="form-control" placeholder="Ej: Sustanciador, Secretaria, Juez">
-            </div>
-            <div class="form-grupo">
-              <label>Prioridad</label>
-              <select class="form-control">
-                <option>Normal</option>
-                <option>Alta</option>
-                <option>Urgente</option>
-              </select>
-            </div>
-            <div class="form-grupo full">
-              <label>Descripción</label>
-              <textarea class="form-control" placeholder="Descripción libre del evento o la actuación..."></textarea>
-            </div>
-            <div class="form-grupo full">
-              <label>Notas</label>
-              <textarea class="form-control" placeholder="Observaciones adicionales..." style="min-height:60px;"></textarea>
-            </div>
-
-            <!-- Fecha de vencimiento calculada -->
-            <div class="form-vencimiento">
-              <span style="font-size:1.5rem">📅</span>
-              <div>
-                <div class="venc-label">Fecha de vencimiento calculada</div>
-                <div class="venc-fecha">Seleccione fecha de inicio y plazo</div>
-              </div>
-            </div>
-
-            <div class="form-acciones">
-              <button class="btn btn-secundario">Cancelar</button>
-              <button class="btn btn-primario">💾 Guardar evento</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ═══════ PANTALLA: NOTIFICACIONES ═══════ -->
-      <section class="pantalla" id="pant-notificaciones">
-        <div class="filtros-bar" style="margin-bottom:14px;">
-          <span class="filtro-chip activo">Todas</span>
-          <span class="filtro-chip">No leídas</span>
-          <span class="filtro-chip">🔴 Vencimientos</span>
-          <span class="filtro-chip">⏰ Alertas</span>
-          <button class="btn btn-secundario" style="margin-left:auto;font-size:0.8rem;padding:6px 14px;">Marcar todas leídas</button>
-        </div>
-        <div class="panel">
-          <ul class="notif-lista panel-body" style="max-height:none;">
-            <li class="notif-item no-leida">
-              <span class="notif-icono">🔴</span>
-              <div class="notif-contenido">
-                <div class="notif-titulo">VENCIDO — Tutela 2026-00142</div>
-                <div class="notif-detalle">El término para fallar esta tutela venció hace 2 días hábiles. Acción inmediata requerida.</div>
-              </div>
-              <div class="notif-acciones">
-                <span class="notif-tiempo">Hace 10 min</span>
-                <button class="btn-atender">✅ Marcar atendida</button>
-              </div>
-            </li>
-            <li class="notif-item no-leida">
-              <span class="notif-icono">🔴</span>
-              <div class="notif-contenido">
-                <div class="notif-titulo">VENCIDO — D. Petición 2026-00189</div>
-                <div class="notif-detalle">El derecho de petición venció ayer. Riesgo de tutela por desacato.</div>
-              </div>
-              <div class="notif-acciones">
-                <span class="notif-tiempo">Hace 30 min</span>
-                <button class="btn-atender">✅ Marcar atendida</button>
-              </div>
-            </li>
-            <li class="notif-item no-leida">
-              <span class="notif-icono">🟠</span>
-              <div class="notif-contenido">
-                <div class="notif-titulo">Próximo a vencer — Recurso de Apelación 2026-00198</div>
-                <div class="notif-detalle">Vence mañana. Conceder y enviar a reparto al Tribunal Superior de Ibagué.</div>
-              </div>
-              <div class="notif-acciones">
-                <span class="notif-tiempo">Hace 1h</span>
-                <button class="btn-atender">✅ Marcar atendida</button>
-              </div>
-            </li>
-            <li class="notif-item">
-              <span class="notif-icono">🟡</span>
-              <div class="notif-contenido">
-                <div class="notif-titulo">Alerta — Desacato 2026-00195</div>
-                <div class="notif-detalle">Vence en 2 días hábiles. Correr traslado al accionado y resolver.</div>
-              </div>
-              <div class="notif-acciones">
-                <span class="notif-tiempo">Hace 3h</span>
-                <button class="btn-atender">✅ Marcar atendida</button>
-              </div>
-            </li>
-            <li class="notif-item">
-              <span class="notif-icono">✅</span>
-              <div class="notif-contenido">
-                <div class="notif-titulo">Cumplido — Tutela en contra 2026-00160</div>
-                <div class="notif-detalle">Contestación radicada dentro del término. Evento archivado.</div>
-              </div>
-              <div class="notif-acciones">
-                <span class="notif-tiempo">Ayer</span>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <!-- ═══════ PANTALLA: CONFIGURACIÓN ═══════ -->
-      <section class="pantalla" id="pant-config">
-        <div class="config-grid">
-          <div class="config-card">
-            <h3>🔔 Alertas</h3>
-            <div class="config-opcion">
-              <div>
-                <label>Sonido de alerta</label>
-                <small>Reproducir sonido para eventos vencidos</small>
-              </div>
-              <button class="toggle activo" onclick="this.classList.toggle('activo')"></button>
-            </div>
-            <div class="config-opcion">
-              <div>
-                <label>Notificaciones push</label>
-                <small>Recibir notificaciones del navegador</small>
-              </div>
-              <button class="toggle activo" onclick="this.classList.toggle('activo')"></button>
-            </div>
-            <div class="config-opcion">
-              <div>
-                <label>Días de anticipación</label>
-                <small>Días antes del vencimiento para alertar</small>
-              </div>
-              <input type="number" class="form-control" value="2" min="1" max="10" style="width:70px;text-align:center;padding:6px;">
-            </div>
-          </div>
-
-          <div class="config-card">
-            <h3>🎨 Apariencia</h3>
-            <div class="config-opcion">
-              <div>
-                <label>Tema oscuro</label>
-                <small>Cambiar entre tema claro y oscuro</small>
-              </div>
-              <button class="toggle" id="toggle-tema" onclick="toggleTema(this)"></button>
-            </div>
-          </div>
-
-          <div class="config-card">
-            <h3>📅 Festivos</h3>
-            <div class="config-opcion">
-              <div>
-                <label>Festivos colombianos 2026</label>
-                <small>18 festivos precargados (Ley 51/1983)</small>
-              </div>
-              <button class="btn btn-secundario" style="font-size:0.8rem;padding:6px 14px;">📋 Ver lista</button>
-            </div>
-            <div class="config-opcion">
-              <div>
-                <label>Festivos locales</label>
-                <small>Agregar festivos adicionales de Ibagué</small>
-              </div>
-              <button class="btn btn-secundario" style="font-size:0.8rem;padding:6px 14px;">➕ Agregar</button>
-            </div>
-          </div>
-
-          <div class="config-card">
-            <h3>💾 Datos</h3>
-            <div class="config-opcion">
-              <div>
-                <label>Exportar datos</label>
-                <small>Descargar todos los eventos en JSON</small>
-              </div>
-              <button class="btn btn-primario" style="font-size:0.8rem;padding:6px 14px;">📤 Exportar</button>
-            </div>
-            <div class="config-opcion">
-              <div>
-                <label>Importar datos</label>
-                <small>Restaurar desde archivo JSON</small>
-              </div>
-              <button class="btn btn-secundario" style="font-size:0.8rem;padding:6px 14px;">📥 Importar</button>
-            </div>
-            <div class="config-opcion">
-              <div>
-                <label>Reporte imprimible</label>
-                <small>Generar reporte para imprimir</small>
-              </div>
-              <button class="btn btn-secundario" style="font-size:0.8rem;padding:6px 14px;">🖨️ Imprimir</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
+<!-- ACCESO FIREBASE -->
+<div class="auth-gate" id="firebase-gate">
+  <div class="auth-card">
+    <div class="auth-esc">⚖️</div>
+    <h2>SIGAJ — Acceso autenticado</h2>
+    <p>La sincronización está configurada. Inicie sesión con la cuenta de Google autorizada para acceder a los datos compartidos.</p>
+    <div class="auth-msg" id="firebase-gate-msg">Esperando autenticación…</div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-p" onclick="iniciarSesionFirebase()">🔐 Iniciar sesión con Google</button>
+      <button class="btn btn-s" onclick="abrirConfigFirebase()">⚙️ Configuración</button>
     </div>
   </div>
+</div>
 
-  <!-- ═══════ JAVASCRIPT — Navegación y UI ═══════ -->
-  <script>
-    /* ── Navegación entre pantallas ── */
-    const titulos = {
-      dashboard: '📊 Dashboard',
-      eventos: '📋 Gestión de Eventos',
-      nuevo: '➕ Nuevo Evento',
-      notificaciones: '🔔 Notificaciones',
-      config: '⚙️ Configuración'
-    };
+<!-- CONFIGURACIÓN FIREBASE -->
+<div class="modal-bg" id="modal-firebase"><div class="modal" style="max-width:650px">
+  <h3>☁️ Configuración de Firebase</h3>
+  <p class="fb-help">SIGAJ ya incluye la configuración canónica de Firebase. Estos campos permiten crear, solo en este dispositivo, una configuración local alternativa si alguna vez fuera necesario. El correo autorizado debe coincidir exactamente con las reglas de seguridad de Firestore.</p>
+  <div class="fb-grid">
+    <div class="f-g full"><label>Correo autorizado *</label><input type="email" class="fc" id="fb-email" autocomplete="email"></div>
+    <div class="f-g full"><label>API key *</label><input class="fc" id="fb-api-key" autocomplete="off"></div>
+    <div class="f-g"><label>Auth domain *</label><input class="fc" id="fb-auth-domain" placeholder="proyecto.firebaseapp.com" autocomplete="off"></div>
+    <div class="f-g"><label>Project ID *</label><input class="fc" id="fb-project-id" autocomplete="off"></div>
+    <div class="f-g"><label>Storage bucket</label><input class="fc" id="fb-storage-bucket" autocomplete="off"></div>
+    <div class="f-g"><label>Messaging sender ID</label><input class="fc" id="fb-messaging-sender-id" autocomplete="off"></div>
+    <div class="f-g full"><label>App ID *</label><input class="fc" id="fb-app-id" autocomplete="off"></div>
+  </div>
+  <div class="modal-acts" style="margin-top:16px;justify-content:space-between;flex-wrap:wrap">
+    <button class="btn btn-danger" onclick="desconectarFirebaseLocal()">Restaurar configuración embebida</button>
+    <div style="display:flex;gap:8px"><button class="btn btn-s" onclick="cerrarConfigFirebase()">Cancelar</button><button class="btn btn-p" onclick="guardarConfigFirebase()">💾 Guardar y activar</button></div>
+  </div>
+</div></div>
 
-    function navegar(pantalla, boton) {
-      // Ocultar todas las pantallas
-      document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('visible'));
-      // Mostrar la seleccionada
-      const pant = document.getElementById('pant-' + pantalla);
-      if (pant) pant.classList.add('visible');
+<!-- MODAL BIFURCACIÓN EJECUTORIA -->
+<div class="modal-bg" id="modal-bif"><div class="modal" style="max-width:480px">
+  <h3>⚖️ Vencimiento del traslado — Ejecutoria</h3>
+  <p id="bif-info" style="margin-bottom:14px"></p>
+  <p style="margin-bottom:10px;font-weight:600">¿Se interpuso recurso de apelación dentro del término?</p>
+  <div style="display:flex;gap:10px;margin-bottom:14px">
+    <button class="btn btn-s" style="flex:1;justify-content:center" onclick="bifSeleccion(false)">❌ No se interpuso</button>
+    <button class="btn btn-p" style="flex:1;justify-content:center" onclick="bifSeleccion(true)">✅ Sí se interpuso</button>
+  </div>
+  <div id="bif-fecha-recurso" style="display:none;margin-bottom:14px">
+    <label style="font-size:.72rem;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Fecha de interposición del recurso</label>
+    <input type="date" class="fc" id="bif-fecha-input">
+  </div>
+  <div class="modal-acts">
+    <button class="btn btn-s" onclick="cerrarModalBif()">Cancelar</button>
+    <button class="btn btn-p" id="bif-confirmar-btn" style="display:none" onclick="confirmarBifurcacion()">Confirmar</button>
+  </div>
+</div></div>
 
-      // Actualizar navegación activa
-      document.querySelectorAll('.sidebar-nav-item').forEach(b => b.classList.remove('activo'));
-      const navItems = document.querySelectorAll('.sidebar-nav-item');
-      const indice = { dashboard: 0, eventos: 1, nuevo: 2, notificaciones: 3, config: 4 };
-      if (navItems[indice[pantalla]]) navItems[indice[pantalla]].classList.add('activo');
+<script>
+/* ============================================
+   SIGAJ v3.0 — LÓGICA COMPLETA + FIREBASE
+   Juzgado 14 Penal Municipal — Ibagué
+   ============================================ */
 
-      // Actualizar título del header
-      document.getElementById('header-titulo').textContent = titulos[pantalla] || '';
+// ── CATEGORÍAS DE ACTUACIONES ──
+const CATS = [
+  {id:'tutela_contra',nombre:'🛡️ Tutela en contra del Juzgado',plazo:2,alerta:'URGENTE — Término perentorio constitucional'},
+  {id:'derecho_peticion',nombre:'📩 Derecho de Petición',plazo:15,alerta:'Verificar si es de información (10 días) o general (15 días)'},
+  {id:'derecho_peticion_info',nombre:'📩 Der. Petición — Información',plazo:10,alerta:'Término reducido por solicitud de información'},
+  {id:'recurso_reposicion',nombre:'⚖️ Recurso de Reposición',plazo:3,alerta:'Resolver dentro del término'},
+  {id:'recurso_apelacion',nombre:'⚖️ Recurso de Apelación',plazo:3,alerta:'Conceder y enviar a reparto al Tribunal'},
+  {id:'ejecutoria_sentencia',nombre:'📜 Ejecutoria Sentencia Penal',plazo:5,alerta:'Verificar recurso. Si firme, ejecutoriar y comunicar',bifurcacion:true},
+  {id:'incidente_reparacion',nombre:'💰 Inc. Reparación Integral',plazo:30,alerta:'Programar audiencia dentro del término'},
+  {id:'vigilancia_judicial',nombre:'🔍 Vigilancia Judicial',plazo:5,alerta:'Rendir informe de vigilancia'},
+  {id:'desacato',nombre:'⚠️ Incidente de Desacato',plazo:3,alerta:'Correr traslado y resolver'},
+  {id:'solicitud_general',nombre:'📝 Solicitud General',plazo:15,alerta:'Revisar y resolver'},
+  {id:'tutela_primera',nombre:'🛡️ Tutela — Fallo 1ª Instancia',plazo:10,alerta:'CONSTITUCIONAL — 10 días perentorios'},
+  {id:'tutela_impugnacion',nombre:'🛡️ Tutela — Impugnación',plazo:2,alerta:'Remitir expediente al Tribunal'},
+  {id:'medida_cautelar',nombre:'🔒 Medida Cautelar',plazo:1,alerta:'INMEDIATA — Resolver con urgencia'},
+  {id:'comision',nombre:'📤 Comisión / Despacho Comisorio',plazo:10,alerta:'Cumplir y devolver al comitente'},
+  {id:'requerimiento_ente',nombre:'🏛️ Req. Ente de Control',plazo:5,alerta:'Responder al ente de control'},
+  {id:'otro',nombre:'📌 Otro',plazo:10,alerta:'Verificar término aplicable'}
+];
 
-      // Cerrar menú en móvil
-      cerrarMenu();
+// ── FESTIVOS COLOMBIANOS ──
+function pascua(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mes=Math.floor((h+l-7*m+114)/31),dia=((h+l-7*m+114)%31)+1;return new Date(y,mes-1,dia)}
+
+function lunSig(d){const f=new Date(d);const dia=f.getDay();if(dia===1)return f;const diff=dia===0?1:(8-dia);f.setDate(f.getDate()+diff);return f}
+
+function parseFechaLocal(valor){if(valor instanceof Date)return new Date(valor.getTime());if(typeof valor==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(valor)){const [y,m,d]=valor.split('-').map(Number);return new Date(y,m-1,d,12,0,0,0)}return new Date(valor)}
+
+function festivosColombia(y){
+  const p=pascua(y);const fds=d=>parseFechaLocal(d);
+  const add=(base,dias)=>{const r=new Date(base);r.setDate(r.getDate()+dias);return r};
+  const fijos=[fds(`${y}-01-01`),fds(`${y}-05-01`),fds(`${y}-07-20`),fds(`${y}-08-07`),fds(`${y}-12-08`),fds(`${y}-12-25`)];
+  const emiliani=[lunSig(fds(`${y}-01-06`)),lunSig(fds(`${y}-03-19`)),lunSig(fds(`${y}-06-29`)),lunSig(fds(`${y}-08-15`)),lunSig(fds(`${y}-10-12`)),lunSig(fds(`${y}-11-01`)),lunSig(fds(`${y}-11-11`))];
+  const semana=[add(p,-3),add(p,-2),lunSig(add(p,43)),lunSig(add(p,64)),lunSig(add(p,71))];
+  return [...fijos,...emiliani,...semana].map(d=>fmt(d));
+}
+
+let cacheFestivos={};
+function getFestivos(y){if(!cacheFestivos[y])cacheFestivos[y]=festivosColombia(y);return cacheFestivos[y]}
+function esFestivo(d){return getFestivos(d.getFullYear()).includes(fmt(d))}
+function esHabil(d){const dia=d.getDay();return dia!==0&&dia!==6&&!esFestivo(d)}
+
+// ── CÁLCULO DE VENCIMIENTO ──
+function calcularVencimiento(fechaInicio,diasHabiles){
+  const f=parseFechaLocal(fechaInicio);let c=0;
+  while(c<diasHabiles){f.setDate(f.getDate()+1);if(esHabil(f))c++}
+  return f;
+}
+
+function diasHabilesRestantes(vencimiento){
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const v=parseFechaLocal(vencimiento);v.setHours(0,0,0,0);
+  if(v<=hoy){let c=0;const f=new Date(v);while(f<hoy){f.setDate(f.getDate()+1);if(esHabil(f))c++}return -c}
+  let c=0;const f=new Date(hoy);while(f<v){f.setDate(f.getDate()+1);if(esHabil(f))c++}return c;
+}
+
+// ── UTILIDADES ──
+function fmt(d){const dd=parseFechaLocal(d);return `${dd.getFullYear()}-${String(dd.getMonth()+1).padStart(2,'0')}-${String(dd.getDate()).padStart(2,'0')}`}
+function fmtCorta(d){const dd=parseFechaLocal(d);const m=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];return `${dd.getDate()}/${m[dd.getMonth()]}/${dd.getFullYear()}`}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+
+function estadoEvento(ev){
+  if(ev.estado==='cumplido')return 'cumplido';
+  const dr=diasHabilesRestantes(ev.fechaVencimiento);
+  const diasAnt=getConfig().diasAnticipacion||2;
+  if(dr<0)return 'vencido';
+  if(dr<=1)return 'critico';
+  if(dr<=diasAnt)return 'proximo';
+  return 'ok';
+}
+
+function colorEstado(st){return{ok:'g',proximo:'y',critico:'o',vencido:'r',cumplido:'g'}[st]||'g'}
+function txtEstado(st){return{ok:'🟢 Al día',proximo:'⏰ Próximo',critico:'🟠 Urgente',vencido:'🔴 Vencido',cumplido:'✅ Cumplido'}[st]||''}
+function claseEstado(st){return{ok:'pen',proximo:'pen',critico:'pen',vencido:'ven',cumplido:'cum'}[st]||'pen'}
+
+function catById(id){return CATS.find(c=>c.id===id)||CATS[CATS.length-1]}
+
+// ── ALMACENAMIENTO LOCAL + COLA DE SINCRONIZACIÓN ──
+const SIGAJ_STORAGE={eventos:'sigaj_eventos',config:'sigaj_config',notifs:'sigaj_notifs',cola:'sigaj_sync_queue',firebase:'sigaj_firebase_settings'};
+
+// Configuración canónica del proyecto Firebase de SIGAJ.
+// Estos identificadores pertenecen a la app web cliente; la autorización real
+// se controla con Firebase Authentication y las reglas de seguridad de Firestore.
+const SIGAJ_FIREBASE_EMBEDDED={
+  emailAutorizado:'difegulo@gmail.com',
+  firebaseConfig:{
+    apiKey:'AIzaSyDt_fbPtiIRh8dyF4vt5UTO76iPgIqtEUM',
+    authDomain:'sigaj-d7d1c.firebaseapp.com',
+    projectId:'sigaj-d7d1c',
+    storageBucket:'sigaj-d7d1c.firebasestorage.app',
+    messagingSenderId:'289735861745',
+    appId:'1:289735861745:web:aa421ed65eb95564885050'
+  }
+};
+function getEventos(){try{return JSON.parse(localStorage.getItem(SIGAJ_STORAGE.eventos))||[]}catch(e){return[]}}
+function getConfig(){try{return JSON.parse(localStorage.getItem(SIGAJ_STORAGE.config))||{sonido:true,push:true,diasAnticipacion:2,tema:'claro'}}catch(e){return{sonido:true,push:true,diasAnticipacion:2,tema:'claro'}}}
+function getNotifs(){try{return JSON.parse(localStorage.getItem(SIGAJ_STORAGE.notifs))||[]}catch(e){return[]}}
+function getSyncQueue(){try{return JSON.parse(localStorage.getItem(SIGAJ_STORAGE.cola))||[]}catch(e){return[]}}
+function setSyncQueue(q){localStorage.setItem(SIGAJ_STORAGE.cola,JSON.stringify(q));actualizarIndicadorCola()}
+function claveSync(op){return op.tipo.startsWith('evento_')?'evento:'+op.id:op.tipo}
+function encolarSync(op){
+  const q=getSyncQueue();const clave=claveSync(op);const limpia=q.filter(x=>claveSync(x)!==clave);
+  limpia.push({...op,colaId:uid(),encoladoEn:new Date().toISOString()});setSyncQueue(limpia);
+  if(window.SIGAJ_FIREBASE&&window.SIGAJ_FIREBASE.procesarCola)window.SIGAJ_FIREBASE.procesarCola();
+}
+function setEventos(evs,opciones={}){
+  const anteriores=getEventos();const prev=new Map(anteriores.map(e=>[e.id,e]));
+  if(!opciones.remoto){
+    evs.forEach(e=>{const p=prev.get(e.id);if(p&&JSON.stringify(p)!==JSON.stringify(e)&&e.actualizadoEn===p.actualizadoEn)e.actualizadoEn=new Date().toISOString()});
+  }
+  localStorage.setItem(SIGAJ_STORAGE.eventos,JSON.stringify(evs));
+  if(opciones.remoto)return;
+  const nuevos=new Map(evs.map(e=>[e.id,e]));
+  evs.forEach(e=>{const p=prev.get(e.id);if(!p||JSON.stringify(p)!==JSON.stringify(e))encolarSync({tipo:'evento_upsert',id:e.id,data:e})});
+  anteriores.forEach(e=>{if(!nuevos.has(e.id))encolarSync({tipo:'evento_delete',id:e.id})});
+}
+function setConfig(cfg,opciones={}){localStorage.setItem(SIGAJ_STORAGE.config,JSON.stringify(cfg));if(!opciones.remoto)encolarSync({tipo:'config_set',data:cfg})}
+function guardarConfig(){
+  const cfg={sonido:document.getElementById('cfg-sonido').classList.contains('on'),push:document.getElementById('cfg-push').classList.contains('on'),diasAnticipacion:parseInt(document.getElementById('cfg-dias').value)||2,tema:document.getElementById('cfg-tema').classList.contains('on')?'oscuro':'claro'};
+  setConfig(cfg);
+}
+function setNotifs(n,opciones={}){localStorage.setItem(SIGAJ_STORAGE.notifs,JSON.stringify(n));if(!opciones.remoto)encolarSync({tipo:'notifs_set',data:n})}
+function aplicarEventosRemotos(evs){setEventos(evs,{remoto:true});renderAll()}
+function aplicarConfigRemota(cfg){setConfig(cfg,{remoto:true});renderConfig();renderAll()}
+function aplicarNotifsRemotas(n){setNotifs(n,{remoto:true});renderNotifs();actualizarBadgeNotif()}
+function actualizarIndicadorCola(){const q=getSyncQueue();const txt=document.getElementById('fb-status-text');const btn=document.getElementById('fb-status-btn');if(!txt||!btn)return;if(q.length&&btn.classList.contains('online')){btn.classList.remove('online');btn.classList.add('pending');txt.textContent='Sincronizando'}}
+
+// ── NAVEGACIÓN ──
+const T={dash:'📊 Dashboard',ev:'📋 Gestión de Eventos',new:'➕ Nuevo Evento',notif:'🔔 Notificaciones',cfg:'⚙️ Configuración'};
+const I={dash:0,ev:1,new:2,notif:3,cfg:4};
+function nav(p){
+  document.querySelectorAll('.pant').forEach(x=>x.classList.remove('vis'));
+  const el=document.getElementById('p-'+p);if(el)el.classList.add('vis');
+  document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('on'));
+  const ns=document.querySelectorAll('.nav-btn');if(ns[I[p]])ns[I[p]].classList.add('on');
+  document.getElementById('ht').textContent=T[p]||'';cm();
+  if(p==='ev')renderTabla();
+  if(p==='notif')renderNotifs();
+  if(p==='cfg')renderConfig();
+  if(p==='new'&&!document.getElementById('ev-id').value)limpiarForm();
+}
+function om(){document.getElementById('side').classList.add('open');document.getElementById('ov').classList.add('vis')}
+function cm(){document.getElementById('side').classList.remove('open');document.getElementById('ov').classList.remove('vis')}
+
+// ── FORMULARIO ──
+function poblarSelectTipo(){
+  const sel=document.getElementById('ev-tipo');
+  const filt=document.getElementById('filtro-tipo');
+  sel.innerHTML='<option value="">— Seleccionar —</option>';
+  CATS.forEach(c=>{sel.innerHTML+=`<option value="${c.id}">${c.nombre} (${c.plazo} días)</option>`;filt.innerHTML+=`<option value="${c.id}">${c.nombre}</option>`});
+}
+
+function onTipoChange(){
+  const cat=catById(document.getElementById('ev-tipo').value);
+  if(cat)document.getElementById('ev-plazo').value=cat.plazo;
+  const esBif=cat&&cat.bifurcacion;
+  document.getElementById('ev-bif-info').style.display=esBif?'block':'none';
+  document.getElementById('ev-fecha-label').textContent=esBif?'Fecha de notificación de la sentencia *':'Fecha inicio del término *';
+  calcVenc();
+}
+
+function calcVenc(){
+  const fecha=document.getElementById('ev-fecha').value;
+  const plazo=parseInt(document.getElementById('ev-plazo').value);
+  const txt=document.getElementById('ev-venc-txt');
+  if(!fecha||!plazo){txt.textContent='Seleccione fecha y plazo';return}
+  const venc=calcularVencimiento(fecha+'T12:00:00',plazo);
+  txt.textContent=fmtCorta(venc)+' ('+plazo+' días hábiles)';
+  txt.dataset.venc=fmt(venc);
+}
+
+function limpiarForm(){
+  document.getElementById('ev-id').value='';
+  document.getElementById('ev-rad').value='';
+  document.getElementById('ev-tipo').value='';
+  document.getElementById('ev-fecha').value='';
+  document.getElementById('ev-plazo').value='';
+  document.getElementById('ev-resp').value='';
+  document.getElementById('ev-prio').value='normal';
+  document.getElementById('ev-desc').value='';
+  document.getElementById('ev-link').value='';
+  document.getElementById('ev-notas').value='';
+  document.getElementById('ev-venc-txt').textContent='Seleccione fecha y plazo';
+  document.getElementById('form-titulo').textContent='➕ Registrar nuevo evento';
+}
+
+function guardarEvento(){
+  const rad=document.getElementById('ev-rad').value.trim();
+  const tipo=document.getElementById('ev-tipo').value;
+  const fecha=document.getElementById('ev-fecha').value;
+  const plazo=parseInt(document.getElementById('ev-plazo').value);
+  if(!rad||!tipo||!fecha||!plazo){toast('⚠️ Complete los campos obligatorios');return}
+  const venc=calcularVencimiento(fecha+'T12:00:00',plazo);
+  const evs=getEventos();
+  const id=document.getElementById('ev-id').value||uid();
+  const existente=evs.findIndex(e=>e.id===id);
+  const cat=catById(tipo);
+  const ev={id,radicado:rad,tipo,descripcion:document.getElementById('ev-desc').value,fechaInicio:fecha,plazoHabiles:plazo,fechaVencimiento:fmt(venc),responsable:document.getElementById('ev-resp').value,estado:'pendiente',prioridad:document.getElementById('ev-prio').value,notas:document.getElementById('ev-notas').value,enlace:document.getElementById('ev-link').value,creadoEn:existente>=0?evs[existente].creadoEn:new Date().toISOString(),actualizadoEn:new Date().toISOString()};
+  if(cat&&cat.bifurcacion){
+    if(existente>=0&&evs[existente].faseActual){
+      // conservar el estado de bifurcación ya avanzado al editar otros campos
+      ev.faseActual=evs[existente].faseActual;ev.fechaNotificacion=evs[existente].fechaNotificacion;
+      ev.huboRecurso=evs[existente].huboRecurso;ev.fechaInterposicionRecurso=evs[existente].fechaInterposicionRecurso;
+      ev.fechaVencTrasladoNoRecurrentes=evs[existente].fechaVencTrasladoNoRecurrentes;ev.fechaEjecutoria=evs[existente].fechaEjecutoria;
+      ev.fechaVencimiento=evs[existente].fechaVencimiento; // no pisar el vencimiento ya recalculado por la bifurcación
+    } else {
+      ev.faseActual='traslado_recurrentes';ev.fechaNotificacion=fecha;ev.huboRecurso=null;
+      ev.fechaInterposicionRecurso=null;ev.fechaVencTrasladoNoRecurrentes=null;ev.fechaEjecutoria=null;
     }
+  }
+  if(existente>=0){ev.estado=evs[existente].estado;evs[existente]=ev}else{evs.push(ev);agregarNotif('➕','Nuevo evento registrado: '+rad,catById(tipo).nombre)}
+  setEventos(evs);limpiarForm();toast('✅ Evento guardado correctamente');nav('ev');renderAll();
+}
 
-    /* ── Menú móvil ── */
-    function abrirMenu() {
-      document.getElementById('sidebar').classList.add('abierto');
-      document.getElementById('overlay').classList.add('visible');
+function editarEvento(id){
+  const ev=getEventos().find(e=>e.id===id);if(!ev)return;
+  document.getElementById('ev-id').value=ev.id;
+  document.getElementById('ev-rad').value=ev.radicado;
+  document.getElementById('ev-tipo').value=ev.tipo;
+  document.getElementById('ev-fecha').value=ev.fechaInicio;
+  document.getElementById('ev-plazo').value=ev.plazoHabiles;
+  document.getElementById('ev-resp').value=ev.responsable||'';
+  document.getElementById('ev-prio').value=ev.prioridad||'normal';
+  document.getElementById('ev-desc').value=ev.descripcion||'';
+  document.getElementById('ev-link').value=ev.enlace||'';
+  document.getElementById('ev-notas').value=ev.notas||'';
+  document.getElementById('form-titulo').textContent='✏️ Editar evento — '+ev.radicado;
+  calcVenc();nav('new');
+}
+
+function marcarCumplido(id){
+  const evs=getEventos();const ev=evs.find(e=>e.id===id);if(!ev)return;
+  ev.estado='cumplido';ev.actualizadoEn=new Date().toISOString();
+  setEventos(evs);agregarNotif('✅','Cumplido — '+ev.radicado,catById(ev.tipo).nombre);
+  toast('✅ Evento marcado como cumplido');renderAll();
+}
+
+function confirmarEliminar(id){
+  const ev=getEventos().find(e=>e.id===id);if(!ev)return;
+  document.getElementById('modal-t').textContent='Eliminar evento';
+  document.getElementById('modal-p').textContent='¿Está seguro de eliminar el evento '+ev.radicado+'? Esta acción no se puede deshacer.';
+  document.getElementById('modal-btn').onclick=()=>{eliminarEvento(id)};
+  document.getElementById('modal').classList.add('vis');
+}
+function cerrarModal(){document.getElementById('modal').classList.remove('vis')}
+function eliminarEvento(id){
+  const evs=getEventos().filter(e=>e.id!==id);setEventos(evs);cerrarModal();
+  toast('🗑️ Evento eliminado');renderAll();
+}
+
+// ── BIFURCACIÓN EJECUTORIA (Ley 906/2004: art. 176 y 179) ──
+let bifEventoId=null;
+function abrirBifurcacion(id){
+  const ev=getEventos().find(e=>e.id===id);if(!ev)return;
+  bifEventoId=id;
+  document.getElementById('bif-info').innerHTML=`Radicado <strong>${ev.radicado}</strong> — venció el traslado a sujetos recurrentes el <strong>${fmtCorta(ev.fechaVencimiento)}</strong>.`;
+  document.getElementById('bif-fecha-recurso').style.display='none';
+  document.getElementById('bif-confirmar-btn').style.display='none';
+  document.getElementById('bif-fecha-input').value='';
+  document.getElementById('modal-bif').classList.add('vis');
+}
+function cerrarModalBif(){document.getElementById('modal-bif').classList.remove('vis');bifEventoId=null}
+let bifRespuesta=null;
+function bifSeleccion(huboRecurso){
+  bifRespuesta=huboRecurso;
+  document.getElementById('bif-fecha-recurso').style.display=huboRecurso?'block':'none';
+  document.getElementById('bif-confirmar-btn').style.display='inline-flex';
+  if(huboRecurso){
+    const hoy=fmt(new Date());
+    document.getElementById('bif-fecha-input').value=hoy;
+  }
+}
+function confirmarBifurcacion(){
+  if(!bifEventoId)return;
+  const evs=getEventos();const ev=evs.find(e=>e.id===bifEventoId);if(!ev)return;
+  if(bifRespuesta===false){
+    // Rama A: no hubo recurso -> queda ejecutoriada
+    ev.faseActual='ejecutoriada';
+    ev.huboRecurso=false;
+    ev.fechaEjecutoria=ev.fechaVencimiento;
+    ev.estado='cumplido';
+    setEventos(evs);
+    agregarNotif('✅','Sentencia ejecutoriada — '+ev.radicado,'Quedó en firme el '+fmtCorta(ev.fechaEjecutoria)+'. Genere la constancia desde la tabla de eventos.');
+    toast('⚖️ Sentencia declarada ejecutoriada');
+  }else{
+    // Rama B: hubo recurso -> abrir segundo plazo de 5 días a no recurrentes
+    const fechaInterp=document.getElementById('bif-fecha-input').value;
+    if(!fechaInterp){toast('⚠️ Indique la fecha de interposición del recurso');return}
+    const vencSegundo=calcularVencimiento(fechaInterp+'T12:00:00',5);
+    ev.faseActual='traslado_no_recurrentes';
+    ev.huboRecurso=true;
+    ev.fechaInterposicionRecurso=fechaInterp;
+    ev.fechaVencTrasladoNoRecurrentes=fmt(vencSegundo);
+    ev.fechaVencimiento=fmt(vencSegundo); // el sistema de alertas sigue este nuevo vencimiento
+    ev.estado='pendiente';
+    setEventos(evs);
+    agregarNotif('🔀','Recurso interpuesto — '+ev.radicado,'Abierto traslado de 5 días a no recurrentes, vence '+fmtCorta(vencSegundo));
+    toast('🔀 Traslado a no recurrentes abierto — vence '+fmtCorta(vencSegundo));
+  }
+  cerrarModalBif();renderAll();
+}
+function marcarRemitidoTribunal(id){
+  const evs=getEventos();const ev=evs.find(e=>e.id===id);if(!ev)return;
+  ev.faseActual='en_tribunal';ev.estado='cumplido';ev.actualizadoEn=new Date().toISOString();
+  setEventos(evs);agregarNotif('📤','Remitido a reparto — '+ev.radicado,'Expediente enviado al Tribunal Superior de Ibagué');
+  toast('📤 Marcado como remitido al Tribunal');renderAll();
+}
+
+function etiquetaFase(ev){
+  if(!ev.faseActual)return null;
+  const dr=diasHabilesRestantes(ev.fechaVencimiento);
+  const map={
+    traslado_recurrentes: dr<0?'🔴 Vencido traslado recurrentes':'⏳ Traslado a recurrentes',
+    traslado_no_recurrentes: dr<0?'🔴 Vencido traslado no recurrentes':'⏳ Traslado a no recurrentes',
+    ejecutoriada: '✅ Ejecutoriada',
+    en_tribunal: '📤 Remitida al Tribunal'
+  };
+  return map[ev.faseActual]||null;
+}
+
+// ── GENERACIÓN DE CONSTANCIAS IMPRIMIBLES ──
+function plantillaConstancia(titulo,cuerpoHtml){
+  return `<!DOCTYPE html><html lang="es-CO"><head><meta charset="UTF-8"><title>${titulo}</title>
+  <style>
+  @page{margin:2.5cm}
+  body{font-family:'Bookman Old Style','Georgia',serif;font-size:11pt;line-height:1.15;color:#000;max-width:19cm;margin:0 auto;padding:2cm}
+  .enc{text-align:center;font-weight:bold;margin-bottom:4px}
+  .linea{border:none;border-top:1.5px solid #162544;margin:16px 0}
+  .titulo{text-align:center;font-weight:bold;font-size:13pt;margin:20px 0}
+  .campo{margin-bottom:8px}.campo b{font-weight:bold}
+  p{text-align:justify;margin-bottom:14px}
+  .firma{text-align:center;margin-top:60px}
+  .firma-linea{border-top:1px solid #000;width:320px;margin:0 auto}
+  .pie{text-align:center;font-size:9pt;color:#666;font-style:italic;margin-top:40px;border-top:1px solid #aaa;padding-top:8px}
+  @media print{body{padding:0}}
+  </style></head><body>
+  <div class="enc">REPÚBLICA DE COLOMBIA</div>
+  <div class="enc">RAMA JUDICIAL DEL PODER PÚBLICO</div>
+  <div class="enc">JUZGADO CATORCE PENAL MUNICIPAL</div>
+  <div class="enc">CON FUNCIÓN DE CONOCIMIENTO</div>
+  <div class="enc">IBAGUÉ — TOLIMA</div>
+  <hr class="linea">
+  <div class="titulo">${titulo}</div>
+  ${cuerpoHtml}
+  <div class="firma">
+    <div class="firma-linea"></div>
+    <div style="font-weight:bold;margin-top:4px">[NOMBRE DEL/LA SECRETARIO(A)]</div>
+    <div>Secretario(a)</div>
+    <div>Juzgado Catorce Penal Municipal con Función de Conocimiento</div>
+  </div>
+  <div class="pie">Juzgado Catorce Penal Municipal con Función de Conocimiento — Ibagué, Tolima</div>
+  </body></html>`;
+}
+
+function generarConstanciaEjecutoria(id){
+  const ev=getEventos().find(e=>e.id===id);if(!ev)return;
+  const cuerpo=`
+  <div class="campo"><b>Radicación:</b> ${ev.radicado}</div>
+  <div class="campo"><b>Responsable:</b> ${ev.responsable||'[NO REGISTRADO]'}</div>
+  <div class="campo"><b>Fecha de notificación de la sentencia:</b> ${fmtCorta(ev.fechaNotificacion||ev.fechaInicio)}</div>
+  <div class="campo"><b>Trámite:</b> Sistema Penal Acusatorio — Procedimiento Abreviado (Ley 906 de 2004)</div>
+  <hr class="linea">
+  <p>La Secretaría del Juzgado Catorce Penal Municipal con Función de Conocimiento de Ibagué, Tolima, <b>HACE CONSTAR:</b></p>
+  <p>Que de conformidad con lo dispuesto en los artículos 176 y 179 de la Ley 906 de 2004, una vez surtida la notificación de la sentencia el día <b>${fmtCorta(ev.fechaNotificacion||ev.fechaInicio)}</b>, se concedió el término de <b>cinco (5) días hábiles</b> de traslado a los sujetos procesales con interés para interponer el recurso de apelación, término que venció el <b>${fmtCorta(ev.fechaVencimiento)}</b>.</p>
+  <p>Que, vencido el referido término, <b>NINGUNO</b> de los sujetos procesales interpuso recurso de apelación contra la sentencia proferida dentro del proceso radicado bajo el número <b>${ev.radicado}</b>.</p>
+  <p>En consecuencia, la sentencia proferida dentro del proceso de la referencia <b>QUEDÓ EJECUTORIADA</b> el día <b>${fmtCorta(ev.fechaEjecutoria||ev.fechaVencimiento)}</b>, al no haberse interpuesto recurso alguno dentro del término legal.</p>
+  <p>La presente constancia se expide para los fines legales pertinentes.</p>
+  `;
+  const html=plantillaConstancia('CONSTANCIA DE EJECUTORIA',cuerpo);
+  const w=window.open('','_blank');w.document.write(html);w.document.close();
+  setTimeout(()=>w.print(),400);
+}
+
+function generarConstanciaTrasladoRecurso(id){
+  const ev=getEventos().find(e=>e.id===id);if(!ev)return;
+  const cuerpo=`
+  <div class="campo"><b>Radicación:</b> ${ev.radicado}</div>
+  <div class="campo"><b>Responsable:</b> ${ev.responsable||'[NO REGISTRADO]'}</div>
+  <div class="campo"><b>Fecha de notificación de la sentencia:</b> ${fmtCorta(ev.fechaNotificacion||ev.fechaInicio)}</div>
+  <div class="campo"><b>Fecha de interposición del recurso:</b> ${fmtCorta(ev.fechaInterposicionRecurso)}</div>
+  <div class="campo"><b>Trámite:</b> Sistema Penal Acusatorio — Procedimiento Abreviado (Ley 906 de 2004)</div>
+  <hr class="linea">
+  <p>La Secretaría del Juzgado Catorce Penal Municipal con Función de Conocimiento de Ibagué, Tolima, <b>HACE CONSTAR:</b></p>
+  <p>Que dentro del término de traslado concedido de conformidad con los artículos 176 y 179 de la Ley 906 de 2004, se interpuso recurso de apelación contra la sentencia proferida dentro del proceso radicado bajo el número <b>${ev.radicado}</b>, el día <b>${fmtCorta(ev.fechaInterposicionRecurso)}</b>.</p>
+  <p>Que, en consecuencia, se corrió traslado del recurso interpuesto a los sujetos procesales no recurrentes por el término de <b>cinco (5) días hábiles</b>, contados a partir de la fecha de interposición, término que vence el día <b>${fmtCorta(ev.fechaVencTrasladoNoRecurrentes)}</b>.</p>
+  <p>Vencido el término de traslado a los no recurrentes, se ordenará la remisión del expediente a reparto para el Tribunal Superior del Distrito Judicial de Ibagué, para lo de su competencia.</p>
+  <p>La presente constancia se expide para los fines legales pertinentes.</p>
+  `;
+  const html=plantillaConstancia('CONSTANCIA DE TRASLADO DEL RECURSO',cuerpo);
+  const w=window.open('','_blank');w.document.write(html);w.document.close();
+  setTimeout(()=>w.print(),400);
+}
+
+// ── RENDER: TABLA ──
+let filtroActual='todos';
+function setFiltro(el){
+  document.querySelectorAll('#filtros-ev .flt').forEach(f=>f.classList.remove('on'));
+  el.classList.add('on');filtroActual=el.dataset.f;renderTabla();
+}
+function filtrarEstado(tipo){
+  filtroActual=tipo==='venc'?'vencido':tipo==='prox'?'proximo':tipo==='ok'?'ok':'todos';
+  nav('ev');
+  document.querySelectorAll('#filtros-ev .flt').forEach(f=>{f.classList.remove('on');if(f.dataset.f===filtroActual)f.classList.add('on')});
+  renderTabla();
+}
+
+function renderTabla(){
+  const tbody=document.getElementById('tbody-ev');
+  const tipoFilt=document.getElementById('filtro-tipo').value;
+  const busq=document.getElementById('busq').value.toLowerCase();
+  let evs=getEventos().map(e=>({...e,_st:estadoEvento(e),_dr:diasHabilesRestantes(e.fechaVencimiento)}));
+  if(filtroActual==='vencido')evs=evs.filter(e=>e._st==='vencido'||e._st==='critico');
+  else if(filtroActual==='proximo')evs=evs.filter(e=>e._st==='proximo');
+  else if(filtroActual==='ok')evs=evs.filter(e=>e._st==='ok');
+  else if(filtroActual==='cumplido')evs=evs.filter(e=>e.estado==='cumplido');
+  else evs=evs;
+  if(tipoFilt)evs=evs.filter(e=>e.tipo===tipoFilt);
+  if(busq)evs=evs.filter(e=>e.radicado.toLowerCase().includes(busq)||catById(e.tipo).nombre.toLowerCase().includes(busq)||(e.responsable||'').toLowerCase().includes(busq));
+  evs.sort((a,b)=>a._dr-b._dr);
+  if(!evs.length){tbody.innerHTML='<tr><td colspan="8"><div class="estado-vacio"><div class="ic-g">📋</div><p>No hay eventos con este filtro</p></div></td></tr>';return}
+  tbody.innerHTML=evs.map(e=>{
+    const cat=catById(e.tipo);const rv=e._st==='vencido'||e._st==='critico'?'rv':'';
+    const diasColor=e._dr<0?'var(--danger)':e._dr<=1?'var(--orange)':e._dr<=2?'var(--warn)':'var(--ok)';
+    const linkHtml=e.enlace?`<a href="${e.enlace}" target="_blank" class="link-exp" title="Abrir expediente">📂</a>`:'';
+    const fase=etiquetaFase(e);
+    const estadoHtml=fase?`<span class="st ${claseEstado(e._st)}">${fase}</span>`:`<span class="st ${claseEstado(e._st)}">${txtEstado(e._st)}</span>`;
+    // Acciones específicas de bifurcación
+    let accionesBif='';
+    if(cat.bifurcacion&&e.faseActual==='traslado_recurrentes'&&e._dr<=0){
+      accionesBif=`<button class="btn btn-p btn-sm" onclick="abrirBifurcacion('${e.id}')" title="Registrar si hubo recurso">🔀 Decidir</button> `;
+    }else if(cat.bifurcacion&&e.faseActual==='traslado_no_recurrentes'&&e._dr<=0){
+      accionesBif=`<button class="btn btn-p btn-sm" onclick="marcarRemitidoTribunal('${e.id}')" title="Marcar remitido al Tribunal">📤 Remitir</button> `;
+    }else if(cat.bifurcacion&&e.faseActual==='ejecutoriada'){
+      accionesBif=`<button class="btn btn-s btn-sm" onclick="generarConstanciaEjecutoria('${e.id}')" title="Generar constancia de ejecutoria">🖨️ Constancia</button> `;
+    }else if(cat.bifurcacion&&e.faseActual==='en_tribunal'){
+      accionesBif=`<button class="btn btn-s btn-sm" onclick="generarConstanciaTrasladoRecurso('${e.id}')" title="Generar constancia de traslado del recurso">🖨️ Constancia</button> `;
     }
+    const accionesNormales=e.estado!=='cumplido'&&!cat.bifurcacion?`<button class="btn btn-ok btn-sm" onclick="marcarCumplido('${e.id}')">✅</button> `:'';
+    return `<tr class="${rv}"><td><strong>${e.radicado}</strong> ${linkHtml}</td><td>${cat.nombre.substring(0,30)}</td><td>${fmtCorta(e.fechaInicio)}</td><td>${fmtCorta(e.fechaVencimiento)}</td><td style="color:${diasColor};font-weight:700">${e.estado==='cumplido'?'—':e._dr}</td><td>${estadoHtml}</td><td>${e.responsable||'—'}</td><td style="white-space:nowrap">${accionesBif}${accionesNormales}<button class="btn btn-s btn-sm" onclick="editarEvento('${e.id}')">✏️</button> <button class="btn btn-s btn-sm" onclick="confirmarEliminar('${e.id}')" style="color:var(--danger)">🗑️</button></td></tr>`
+  }).join('');
+}
 
-    function cerrarMenu() {
-      document.getElementById('sidebar').classList.remove('abierto');
-      document.getElementById('overlay').classList.remove('visible');
+// ── RENDER: DASHBOARD ──
+function renderDashboard(){
+  const evs=getEventos().filter(e=>e.estado!=='cumplido');
+  const cumplidos=getEventos().filter(e=>e.estado==='cumplido');
+  let ok=0,prox=0,venc=0;
+  evs.forEach(e=>{const s=estadoEvento(e);if(s==='vencido'||s==='critico')venc++;else if(s==='proximo')prox++;else ok++});
+  document.getElementById('m-total').textContent=evs.length;
+  document.getElementById('m-ok').textContent=ok;
+  document.getElementById('m-prox').textContent=prox;
+  document.getElementById('m-venc').textContent=venc;
+  const metV=document.getElementById('met-venc');
+  if(venc>0){metV.classList.add('r');metV.style.animation=''}else{metV.classList.remove('r')}
+  // Badge sidebar
+  const bv=document.getElementById('bv');
+  if(venc>0){bv.textContent=venc;bv.style.display='flex'}else{bv.style.display='none'}
+  // Urgencias
+  const urg=document.getElementById('lista-urg');
+  const tops=evs.map(e=>({...e,_st:estadoEvento(e),_dr:diasHabilesRestantes(e.fechaVencimiento)})).sort((a,b)=>a._dr-b._dr).slice(0,10);
+  if(!tops.length){urg.innerHTML='<div class="estado-vacio"><div class="ic-g">✅</div><p>Sin eventos pendientes</p></div>';return}
+  urg.innerHTML=tops.map(e=>{
+    const c=colorEstado(e._st);
+    const cat=catById(e.tipo);
+    let vTxt='';
+    if(e._dr<0)vTxt=`Vencido ${Math.abs(e._dr)}d`;else if(e._dr===0)vTxt='Vence hoy';else if(e._dr===1)vTxt='Vence mañana';else vTxt=`Vence en ${e._dr}d`;
+    const linkAttr=e.enlace?`onclick="window.open('${e.enlace}','_blank')"`:`onclick="editarEvento('${e.id}')"`;
+    return `<div class="urg" ${linkAttr}><div class="urg-dot ${c}"></div><div class="urg-info"><div class="urg-rad">${e.radicado}</div><div class="urg-tipo">${cat.nombre}</div></div><span class="urg-v ${c}">${vTxt}</span></div>`
+  }).join('');
+  // Tab title
+  document.title=venc>0?`(${venc}) 🔴 SIGAJ — Agenda Judicial`:'SIGAJ — Agenda Judicial';
+}
+
+// ── RENDER: CALENDARIO ──
+let calMes=new Date().getMonth(),calAnio=new Date().getFullYear();
+function moverMes(d){calMes+=d;if(calMes>11){calMes=0;calAnio++}if(calMes<0){calMes=11;calAnio--}renderCalendario()}
+function renderCalendario(){
+  const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('cal-titulo').textContent=meses[calMes]+' '+calAnio;
+  const grid=document.getElementById('cal-grid');
+  const festivos=getFestivos(calAnio);
+  const evs=getEventos().filter(e=>e.estado!=='cumplido');
+  grid.innerHTML='<div class="cal-dn">Lu</div><div class="cal-dn">Ma</div><div class="cal-dn">Mi</div><div class="cal-dn">Ju</div><div class="cal-dn">Vi</div><div class="cal-dn">Sa</div><div class="cal-dn">Do</div>';
+  const primerDia=new Date(calAnio,calMes,1);let startDay=primerDia.getDay();startDay=startDay===0?6:startDay-1;
+  const diasMes=new Date(calAnio,calMes+1,0).getDate();
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  // Días del mes anterior
+  const diasMesAnt=new Date(calAnio,calMes,0).getDate();
+  for(let i=startDay-1;i>=0;i--)grid.innerHTML+=`<div class="cal-d om">${diasMesAnt-i}</div>`;
+  // Días del mes
+  for(let d=1;d<=diasMes;d++){
+    const fecha=new Date(calAnio,calMes,d);const fs=fmt(fecha);
+    const esHoy=fecha.getTime()===hoy.getTime();
+    const esFest=festivos.includes(fs);
+    const evsDelDia=evs.filter(e=>e.fechaVencimiento===fs);
+    let dots='';
+    evsDelDia.forEach(e=>{const st=estadoEvento(e);const col={ok:'var(--ok)',proximo:'var(--warn)',critico:'var(--orange)',vencido:'var(--danger)'}[st]||'var(--ok)';dots+=`<span class="cal-dot" style="background:${col}"></span>`});
+    grid.innerHTML+=`<div class="cal-d${esHoy?' hoy':''}${esFest?' festivo':''}">${d}${dots?`<div class="cal-dots">${dots}</div>`:''}</div>`;
+  }
+  // Días del mes siguiente
+  const totalCeldas=startDay+diasMes;const restantes=totalCeldas%7===0?0:7-totalCeldas%7;
+  for(let i=1;i<=restantes;i++)grid.innerHTML+=`<div class="cal-d om">${i}</div>`;
+}
+
+// ── NOTIFICACIONES ──
+function agregarNotif(icono,titulo,detalle){
+  const ns=getNotifs();
+  ns.unshift({id:uid(),icono,titulo,detalle,tiempo:new Date().toISOString(),leida:false});
+  if(ns.length>50)ns.pop();
+  setNotifs(ns);actualizarBadgeNotif();
+}
+function actualizarBadgeNotif(){
+  const noLeidas=getNotifs().filter(n=>!n.leida).length;
+  const bn=document.getElementById('bn');const nd=document.getElementById('nd');
+  if(noLeidas>0){bn.textContent=noLeidas;bn.style.display='flex';nd.style.display='block'}else{bn.style.display='none';nd.style.display='none'}
+}
+let filtroNotif='todas';
+function setFiltroNotif(el){
+  document.querySelectorAll('#p-notif .flt').forEach(f=>f.classList.remove('on'));
+  el.classList.add('on');filtroNotif=el.dataset.f;renderNotifs();
+}
+function renderNotifs(){
+  let ns=getNotifs();
+  if(filtroNotif==='no-leidas')ns=ns.filter(n=>!n.leida);
+  const ul=document.getElementById('lista-notif');
+  if(!ns.length){ul.innerHTML='<li class="ni"><div class="estado-vacio" style="width:100%"><div class="ic-g">🔔</div><p>No hay notificaciones</p></div></li>';return}
+  ul.innerHTML=ns.map(n=>{
+    const ago=tiempoRelativo(n.tiempo);
+    return `<li class="ni${n.leida?'':' unr'}"><span class="ni-ic">${n.icono}</span><div class="ni-c"><div class="ni-t">${n.titulo}</div><div class="ni-d">${n.detalle}</div></div><div class="ni-a"><span class="ni-time">${ago}</span>${!n.leida?`<button class="btn-at" onclick="marcarNotifLeida('${n.id}')">✅ Leída</button>`:''}</div></li>`
+  }).join('');
+}
+function marcarNotifLeida(id){const ns=getNotifs();const n=ns.find(x=>x.id===id);if(n)n.leida=true;setNotifs(ns);renderNotifs();actualizarBadgeNotif()}
+function marcarTodasLeidas(){const ns=getNotifs();ns.forEach(n=>n.leida=true);setNotifs(ns);renderNotifs();actualizarBadgeNotif();toast('✅ Todas las notificaciones marcadas como leídas')}
+function tiempoRelativo(iso){const d=new Date(iso);const s=Math.floor((Date.now()-d)/1000);if(s<60)return 'Ahora';if(s<3600)return Math.floor(s/60)+' min';if(s<86400)return Math.floor(s/3600)+'h';return Math.floor(s/86400)+' días'}
+
+// ── CONFIGURACIÓN ──
+function renderConfig(){
+  const cfg=getConfig();
+  document.getElementById('cfg-sonido').classList.toggle('on',cfg.sonido!==false);
+  document.getElementById('cfg-push').classList.toggle('on',cfg.push!==false);
+  document.getElementById('cfg-dias').value=cfg.diasAnticipacion||2;
+  document.getElementById('cfg-tema').classList.toggle('on',cfg.tema==='oscuro');
+  if(cfg.tema==='oscuro')document.documentElement.setAttribute('data-tema','oscuro');
+  // Festivos
+  const lista=document.getElementById('lista-festivos');
+  const y=new Date().getFullYear();const fs=getFestivos(y).sort();
+  lista.innerHTML=fs.map(f=>{const d=new Date(f+'T12:00:00');return `<div style="padding:4px 0;border-bottom:1px solid var(--border)">${fmtCorta(d)}</div>`}).join('');
+}
+
+function toggleTema(btn){btn.classList.toggle('on');document.documentElement.setAttribute('data-tema',btn.classList.contains('on')?'oscuro':'claro');guardarConfig()}
+function togglePush(btn){btn.classList.toggle('on');if(btn.classList.contains('on')&&'Notification'in window)Notification.requestPermission();guardarConfig()}
+
+// ── EXPORTAR / IMPORTAR ──
+function exportar(){
+  const data={eventos:getEventos(),notificaciones:getNotifs(),config:getConfig(),version:'2.0',fecha:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='sigaj-backup-'+fmt(new Date())+'.json';a.click();
+  toast('📤 Datos exportados correctamente');
+}
+function importar(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{const data=JSON.parse(ev.target.result);
+    if(data.eventos)setEventos(data.eventos);
+    if(data.notificaciones)setNotifs(data.notificaciones);
+    if(data.config)setConfig(data.config);
+    toast('📥 Datos importados correctamente');renderAll();renderConfig();
+    }catch(err){toast('❌ Error al importar: archivo inválido')}
+  };reader.readAsText(file);e.target.value='';
+}
+
+// ── BÚSQUEDA ──
+function buscar(){renderTabla()}
+
+// ── CONFIGURACIÓN Y ESTADO FIREBASE ──
+function getFirebaseSettings(){
+  try{
+    const local=JSON.parse(localStorage.getItem(SIGAJ_STORAGE.firebase));
+    return local||SIGAJ_FIREBASE_EMBEDDED;
+  }catch(e){
+    return SIGAJ_FIREBASE_EMBEDDED;
+  }
+}
+function firebaseConfigurado(){const s=getFirebaseSettings();return !!(s&&s.emailAutorizado&&s.firebaseConfig&&s.firebaseConfig.apiKey&&s.firebaseConfig.authDomain&&s.firebaseConfig.projectId&&s.firebaseConfig.appId)}
+function abrirConfigFirebase(){
+  const s=getFirebaseSettings()||{emailAutorizado:'',firebaseConfig:{}};const c=s.firebaseConfig||{};
+  document.getElementById('fb-email').value=s.emailAutorizado||'';document.getElementById('fb-api-key').value=c.apiKey||'';document.getElementById('fb-auth-domain').value=c.authDomain||'';document.getElementById('fb-project-id').value=c.projectId||'';document.getElementById('fb-storage-bucket').value=c.storageBucket||'';document.getElementById('fb-messaging-sender-id').value=c.messagingSenderId||'';document.getElementById('fb-app-id').value=c.appId||'';
+  document.getElementById('modal-firebase').classList.add('vis');
+}
+function cerrarConfigFirebase(){document.getElementById('modal-firebase').classList.remove('vis')}
+function guardarConfigFirebase(){
+  const email=document.getElementById('fb-email').value.trim().toLowerCase();const config={apiKey:document.getElementById('fb-api-key').value.trim(),authDomain:document.getElementById('fb-auth-domain').value.trim(),projectId:document.getElementById('fb-project-id').value.trim(),storageBucket:document.getElementById('fb-storage-bucket').value.trim(),messagingSenderId:document.getElementById('fb-messaging-sender-id').value.trim(),appId:document.getElementById('fb-app-id').value.trim()};
+  if(!email||!config.apiKey||!config.authDomain||!config.projectId||!config.appId){toast('⚠️ Complete correo, API key, Auth domain, Project ID y App ID');return}
+  localStorage.setItem(SIGAJ_STORAGE.firebase,JSON.stringify({emailAutorizado:email,firebaseConfig:config}));
+  cerrarConfigFirebase();location.reload();
+}
+function desconectarFirebaseLocal(){
+  if(!confirm('¿Restaurar en este dispositivo la configuración Firebase incorporada en SIGAJ? Los eventos locales no se eliminarán.'))return;
+  localStorage.removeItem(SIGAJ_STORAGE.firebase);cerrarConfigFirebase();location.reload();
+}
+function iniciarSesionFirebase(){if(window.SIGAJ_FIREBASE&&window.SIGAJ_FIREBASE.signIn)window.SIGAJ_FIREBASE.signIn();else toast('⏳ Firebase aún se está inicializando')}
+function cerrarSesionFirebase(){if(window.SIGAJ_FIREBASE&&window.SIGAJ_FIREBASE.signOut)window.SIGAJ_FIREBASE.signOut()}
+function copiarReglasFirestore(){
+  const s=getFirebaseSettings();if(!s||!s.emailAutorizado){toast('⚠️ Configure primero el correo autorizado');return}
+  const email=String(s.emailAutorizado).trim().toLowerCase().replace(/'/g,"\\'");
+  const reglas=`rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    function esJuezAutorizado() {\n      return request.auth != null\n        && request.auth.token.email != null\n        && request.auth.token.email_verified == true\n        && request.auth.token.email == '${email}';\n    }\n\n    match /eventos/{id} {\n      allow read, write: if esJuezAutorizado();\n    }\n    match /configuracion/{documento} {\n      allow read, write: if esJuezAutorizado();\n    }\n    match /festivos/{anio} {\n      allow read, write: if esJuezAutorizado();\n    }\n    match /{documento=**} {\n      allow read, write: if false;\n    }\n  }\n}`;
+  navigator.clipboard.writeText(reglas).then(()=>toast('📋 Reglas Firestore copiadas')).catch(()=>{const ta=document.createElement('textarea');ta.value=reglas;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('📋 Reglas Firestore copiadas')});
+}
+function actualizarEstadoFirebase(estado,detalle=''){
+  const btn=document.getElementById('fb-status-btn'),txt=document.getElementById('fb-status-text'),icon=document.getElementById('fb-status-icon'),res=document.getElementById('fb-resumen'),login=document.getElementById('fb-login-btn'),logout=document.getElementById('fb-logout-btn'),rules=document.getElementById('fb-rules-btn'),gate=document.getElementById('firebase-gate'),gateMsg=document.getElementById('firebase-gate-msg');
+  if(!btn)return;btn.classList.remove('online','pending','offline','error');
+  const cfg=firebaseConfigurado();
+  if(!cfg){icon.textContent='💻';txt.textContent='Local';if(res)res.innerHTML='<strong>Modo local.</strong> Los datos permanecen únicamente en este dispositivo hasta configurar Firebase.';if(login)login.style.display='none';if(logout)logout.style.display='none';if(rules)rules.style.display='none';if(gate)gate.classList.remove('vis');return}
+  if(estado==='conectado'){btn.classList.add('online');icon.textContent='☁️';txt.textContent='Sincronizado';if(res)res.innerHTML='<strong>Firebase conectado.</strong> '+detalle;if(login)login.style.display='none';if(logout)logout.style.display='inline-flex';if(rules)rules.style.display='inline-flex';if(gate)gate.classList.remove('vis')}
+  else if(estado==='pendiente'){btn.classList.add('pending');icon.textContent='☁️';txt.textContent='Sincronizando';if(res)res.innerHTML='<strong>Sincronización pendiente.</strong> '+detalle;if(gate)gate.classList.remove('vis')}
+  else if(estado==='offline'){btn.classList.add('offline');icon.textContent='📴';txt.textContent='Sin conexión';if(res)res.innerHTML='<strong>Sin conexión.</strong> Los cambios quedan en caché y se enviarán automáticamente al recuperar Internet.';if(logout)logout.style.display='inline-flex';if(rules)rules.style.display='inline-flex';if(gate)gate.classList.remove('vis')}
+  else if(estado==='auth'){icon.textContent='🔐';txt.textContent='Acceso';if(res)res.innerHTML='<strong>Firebase configurado.</strong> Inicie sesión con la cuenta autorizada.';if(login)login.style.display='inline-flex';if(logout)logout.style.display='none';if(rules)rules.style.display='inline-flex';if(gate){gate.classList.add('vis');if(gateMsg)gateMsg.textContent=detalle||'Inicie sesión con la cuenta autorizada.'}}
+  else if(estado==='error'){btn.classList.add('error');icon.textContent='⚠️';txt.textContent='Error';if(res)res.innerHTML='<strong>Error de sincronización.</strong> '+detalle;if(gateMsg)gateMsg.textContent=detalle;if(login)login.style.display='inline-flex'}
+}
+
+// ── TOAST ──
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('vis');setTimeout(()=>t.classList.remove('vis'),3000)}
+
+// ── VERIFICACIÓN PERIÓDICA ──
+function verificarVencimientos(){
+  const evs=getEventos().filter(e=>e.estado!=='cumplido');
+  evs.forEach(e=>{
+    const st=estadoEvento(e);const dr=diasHabilesRestantes(e.fechaVencimiento);
+    if(st==='vencido'&&getConfig().push!==false&&'Notification'in window&&Notification.permission==='granted'){
+      new Notification('🔴 VENCIDO — '+e.radicado,{body:catById(e.tipo).nombre+' — Vencido hace '+Math.abs(dr)+' día(s)',icon:'⚖️',tag:e.id});
     }
+  });
+  // Sonido para vencidos
+  const vencidos=evs.filter(e=>estadoEvento(e)==='vencido');
+  if(vencidos.length>0&&getConfig().sonido!==false){
+    try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=440;g.gain.value=0.08;o.start();o.stop(ctx.currentTime+0.15)}catch(e){}
+  }
+  renderDashboard();
+}
 
-    /* ── Tema oscuro ── */
-    function toggleTema(btn) {
-      btn.classList.toggle('activo');
-      const oscuro = btn.classList.contains('activo');
-      document.documentElement.setAttribute('data-tema', oscuro ? 'oscuro' : 'claro');
+// ── RENDER COMPLETO ──
+function renderAll(){renderDashboard();renderCalendario();renderTabla();actualizarBadgeNotif()}
+
+// ── INICIALIZACIÓN ──
+function init(){
+  poblarSelectTipo();
+  const cfg=getConfig();
+  if(cfg.tema==='oscuro'){document.documentElement.setAttribute('data-tema','oscuro')}
+  renderAll();renderConfig();actualizarEstadoFirebase(firebaseConfigurado()?'auth':'local');
+  // Verificación periódica cada 60 segundos
+  setInterval(verificarVencimientos,60000);
+  // Pedir permisos de notificación
+  if('Notification'in window&&Notification.permission==='default'&&cfg.push!==false)Notification.requestPermission();
+  // Service Worker
+  if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+
+document.addEventListener('DOMContentLoaded',init);
+</script>
+
+<script type="module">
+/* ═══════════════════════════════════════════
+   SIGAJ — Firebase Auth + Firestore
+   SDK modular 12.18.0 · caché persistente
+   ═══════════════════════════════════════════ */
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js';
+import { initializeFirestore, getFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, setDoc, deleteDoc, getDocs, getDocsFromServer, getDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js';
+
+const settings=window.getFirebaseSettings?window.getFirebaseSettings():null;
+if(settings&&window.firebaseConfigurado&&window.firebaseConfigurado()){
+  const autorizado=String(settings.emailAutorizado||'').trim().toLowerCase();
+  let auth=null,db=null,procesando=false,usuarioValido=null;
+  let unsubEventos=null,unsubConfig=null,unsubNotifs=null;
+
+  const app=initializeApp(settings.firebaseConfig);
+  auth=getAuth(app);
+  try{await setPersistence(auth,browserLocalPersistence)}catch(e){console.warn('[SIGAJ] Persistencia Auth:',e)}
+  try{db=initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})})}catch(e){console.warn('[SIGAJ] Caché persistente Firestore no disponible:',e);db=getFirestore(app)}
+
+  function cola(){try{return JSON.parse(localStorage.getItem('sigaj_sync_queue'))||[]}catch(e){return[]}}
+  function guardarCola(q){localStorage.setItem('sigaj_sync_queue',JSON.stringify(q));if(window.actualizarIndicadorCola)window.actualizarIndicadorCola()}
+  function quitarCola(id){guardarCola(cola().filter(x=>x.colaId!==id))}
+  function marcaTiempo(ev){const t=Date.parse(ev?.actualizadoEn||ev?.creadoEn||'');return Number.isFinite(t)?t:0}
+  function fusionarConPendientes(remotos){
+    const mapa=new Map(remotos.map(e=>[e.id,e]));
+    cola().forEach(op=>{if(op.tipo==='evento_delete')mapa.delete(op.id);if(op.tipo==='evento_upsert'&&op.data)mapa.set(op.id,op.data)});
+    return [...mapa.values()];
+  }
+  function configConPendientes(remota){const op=[...cola()].reverse().find(x=>x.tipo==='config_set');return op?.data||remota}
+  function notifsConPendientes(remotas){const op=[...cola()].reverse().find(x=>x.tipo==='notifs_set');return op?.data||remotas}
+
+  async function procesarCola(){
+    if(procesando||!db||!usuarioValido)return;
+    if(!navigator.onLine){window.actualizarEstadoFirebase?.('offline');return}
+    procesando=true;
+    try{
+      const pendientes=[...cola()];
+      for(const op of pendientes){
+        try{
+          if(op.tipo==='evento_upsert')await setDoc(doc(db,'eventos',op.id),JSON.parse(JSON.stringify(op.data)));
+          else if(op.tipo==='evento_delete')await deleteDoc(doc(db,'eventos',op.id));
+          else if(op.tipo==='config_set')await setDoc(doc(db,'configuracion','general'),{...JSON.parse(JSON.stringify(op.data)),_syncActualizadoEn:new Date().toISOString()});
+          else if(op.tipo==='notifs_set')await setDoc(doc(db,'configuracion','notificaciones'),{items:JSON.parse(JSON.stringify(op.data)),_syncActualizadoEn:new Date().toISOString()});
+          quitarCola(op.colaId);
+        }catch(err){console.warn('[SIGAJ] Operación pendiente:',err);window.actualizarEstadoFirebase?.(navigator.onLine?'error':'offline',err.message||'No fue posible sincronizar.');break}
+      }
+    }finally{
+      procesando=false;
+      if(usuarioValido){const n=cola().length;window.actualizarEstadoFirebase?.(!navigator.onLine?'offline':n?'pendiente':'conectado',n?`${n} cambio(s) pendiente(s).`:`Cuenta: ${usuarioValido.email}`)}
     }
+  }
 
-    /* ── Filtros (chips) ── */
-    document.querySelectorAll('.filtros-bar').forEach(bar => {
-      bar.querySelectorAll('.filtro-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-          bar.querySelectorAll('.filtro-chip').forEach(c => c.classList.remove('activo'));
-          chip.classList.add('activo');
-        });
-      });
-    });
+  async function leerEventosServidor(){
+    try{return navigator.onLine?await getDocsFromServer(collection(db,'eventos')):await getDocs(collection(db,'eventos'))}catch(e){return await getDocs(collection(db,'eventos'))}
+  }
 
-    /* ── Título de la pestaña con badge ── */
-    document.title = '(3) 🔴 SIGAJ — Agenda Judicial';
-
-    /* ── Registro del Service Worker (PWA) ── */
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('[SIGAJ] Service Worker registrado:', reg.scope))
-        .catch(err => console.warn('[SIGAJ] SW no registrado:', err));
+  async function migrarDatosLocales(){
+    const locales=window.getEventos?window.getEventos():[];
+    const snap=await leerEventosServidor();
+    const remotos=snap.docs.map(d=>({id:d.id,...d.data()}));
+    const mapa=new Map(remotos.map(e=>[e.id,e]));
+    const subidas=[];
+    for(const local of locales){
+      const remoto=mapa.get(local.id);
+      if(!remoto||marcaTiempo(local)>marcaTiempo(remoto)){mapa.set(local.id,local);subidas.push(setDoc(doc(db,'eventos',local.id),JSON.parse(JSON.stringify(local))))}
     }
-  </script>
+    if(subidas.length)await Promise.all(subidas);
+    window.aplicarEventosRemotos?.(fusionarConPendientes([...mapa.values()]));
+
+    const cfgRef=doc(db,'configuracion','general');const cfgSnap=await getDoc(cfgRef);
+    if(!cfgSnap.exists())await setDoc(cfgRef,{...window.getConfig(),_syncActualizadoEn:new Date().toISOString()});
+    else{const d=cfgSnap.data();delete d._syncActualizadoEn;window.aplicarConfigRemota?.(configConPendientes(d))}
+
+    const nRef=doc(db,'configuracion','notificaciones');const nSnap=await getDoc(nRef);
+    if(!nSnap.exists())await setDoc(nRef,{items:window.getNotifs(),_syncActualizadoEn:new Date().toISOString()});
+    else window.aplicarNotifsRemotas?.(notifsConPendientes(nSnap.data().items||[]));
+  }
+
+  function detenerListeners(){if(unsubEventos)unsubEventos();if(unsubConfig)unsubConfig();if(unsubNotifs)unsubNotifs();unsubEventos=unsubConfig=unsubNotifs=null}
+  function iniciarListeners(){
+    detenerListeners();
+    unsubEventos=onSnapshot(collection(db,'eventos'),{includeMetadataChanges:true},snap=>{
+      const remotos=snap.docs.map(d=>({id:d.id,...d.data()}));window.aplicarEventosRemotos?.(fusionarConPendientes(remotos));
+      const n=cola().length;window.actualizarEstadoFirebase?.(!navigator.onLine?'offline':(snap.metadata.hasPendingWrites||n)?'pendiente':'conectado',(snap.metadata.hasPendingWrites||n)?`${n||1} cambio(s) pendiente(s).`:`Cuenta: ${usuarioValido?.email||''}`);
+    },err=>window.actualizarEstadoFirebase?.('error',err.message));
+    unsubConfig=onSnapshot(doc(db,'configuracion','general'),snap=>{if(!snap.exists())return;const d=snap.data();delete d._syncActualizadoEn;window.aplicarConfigRemota?.(configConPendientes(d))},err=>console.warn('[SIGAJ] Config listener:',err));
+    unsubNotifs=onSnapshot(doc(db,'configuracion','notificaciones'),snap=>{if(!snap.exists())return;window.aplicarNotifsRemotas?.(notifsConPendientes(snap.data().items||[]))},err=>console.warn('[SIGAJ] Notifs listener:',err));
+  }
+
+  const provider=new GoogleAuthProvider();provider.setCustomParameters({login_hint:autorizado,prompt:'select_account'});
+  window.SIGAJ_FIREBASE={
+    signIn:async()=>{try{window.actualizarEstadoFirebase?.('auth','Abriendo acceso de Google…');await signInWithPopup(auth,provider)}catch(e){window.actualizarEstadoFirebase?.('auth',e.code==='auth/popup-closed-by-user'?'Inicio de sesión cancelado.':(e.message||'No fue posible iniciar sesión.'))}},
+    signOut:async()=>{detenerListeners();usuarioValido=null;await firebaseSignOut(auth)},
+    procesarCola
+  };
+
+  onAuthStateChanged(auth,async user=>{
+    if(!user){detenerListeners();usuarioValido=null;window.actualizarEstadoFirebase?.('auth',`Cuenta autorizada: ${autorizado}`);return}
+    const email=String(user.email||'').trim().toLowerCase();
+    if(email!==autorizado){detenerListeners();usuarioValido=null;window.actualizarEstadoFirebase?.('error',`La cuenta ${email||'(sin correo)'} no está autorizada. Debe usar ${autorizado}.`);await firebaseSignOut(auth);return}
+    usuarioValido=user;window.actualizarEstadoFirebase?.(navigator.onLine?'pendiente':'offline','Validando y migrando datos locales…');
+    try{await migrarDatosLocales();iniciarListeners();procesarCola()}catch(e){console.error('[SIGAJ] Inicialización Firebase:',e);window.actualizarEstadoFirebase?.('error',e.message||'No fue posible iniciar Firestore.')}
+  });
+
+  window.addEventListener('online',()=>{if(usuarioValido){window.actualizarEstadoFirebase?.('pendiente','Conexión recuperada. Sincronizando…');procesarCola()}});
+  window.addEventListener('offline',()=>{if(usuarioValido)window.actualizarEstadoFirebase?.('offline')});
+}
+</script>
 
 </body>
 </html>
